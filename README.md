@@ -2,11 +2,11 @@
 
 A static analytics dashboard summarizing the **STEP Odisha_Program Management Sheet: 2026-27** Google Sheet — a 38-tab program tracker for Mantra4Change's Project-Based Learning (PBL) program with the Odisha School & Mass Education Department, OSEPA, and SCERT.
 
-**This repo is private** — the dashboard surfaces internal staff task-ownership and real budget figures, so it should stay that way.
+**This repo is public** — GitHub Pages on a private repo requires a paid GitHub plan, so the repo was made public to publish it. It surfaces internal staff task-ownership and real budget figures; be aware of that before sharing the link further.
 
 ## Viewing it
 
-Open `index.html` directly in a browser, or enable GitHub Pages for this repo (Settings → Pages → deploy from `main` branch, root) to view it at a private Pages URL.
+Live at: https://harsen-alt.github.io/step-odisha-dashboard/
 
 ## What's covered
 
