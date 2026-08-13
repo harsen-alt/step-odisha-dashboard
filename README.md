@@ -18,14 +18,30 @@ Scoped to **Academic Year 2026-27 only** — prior-year comparisons have been dr
 - Task status: the "Program Index" activity tracker vs. the lesson-plan content pipeline ("Project Tracker" + "Revised Project Tracker" tabs)
 - Content-creation progress by grade (6-8) — verified even across all three grades, no lag
 - Rollout timeline: recent deadlines, what's due, September MT/cascade training dates, and a MoM logging gap since mid-June
-- District-level tracking coverage across the top 10 (of 30) districts, from the "Cascading (Teachers & MTs)" tab
+- **District-level school coverage** and a searchable **school explorer**, covering all 30 districts and ~17,600 individual schools state-wide that offer Grade 6, 7, and/or 8 — from the "S&ME School" tab (see below)
 - AY2026-27 budget: PBL Kit total, MT training budget, and the still-unbudgeted Teacher Training (Cascading) line
 - Task ownership by staff member (from Active tabs' own "Owner" columns), and a bus-factor flag
 - Open risks and gaps, each tied to a specific Active tab
 
 ## A note on the school-count figure
 
-The source sheet uses two different school-count scopes across its Active tabs: the "1. Scope" and "PBL Kit" tabs state a **24,000-school** state-wide figure (this dashboard's basis), while the "Cascading (Teachers & MTs)" tab explicitly sizes actual AY2026-27 Master Trainer and HM/teacher cascade-training deployment to **1,184 schools** instead. Both are Active-tab-documented; they describe different scopes (state-wide budget/target vs. current cascade rollout) rather than one being an error — worth keeping both in view when using either figure externally.
+The source sheet uses several different school-count scopes across its tabs, describing different things rather than disagreeing:
+
+- **24,000 schools** — the "1. Scope" and "PBL Kit" tabs' state-wide target/budget figure (used for the top-line KPIs and Budget section).
+- **1,184 schools** — the "Cascading (Teachers & MTs)" tab's figure for this year's actual Master Trainer and HM/teacher cascade-training deployment (used in the Budget section's basis note).
+- **17,633 schools** — the district-level school coverage and school explorer sections' figure: every school in the "S&ME School" tab (17,657 schools state-wide) that offers Grade 6, 7, and/or 8 (`Class From <= 8 and Class To >= 6`). This is the full state-wide eligible-school universe, not a rollout or budget scope — by far the largest of the three figures, and not directly comparable to the other two.
+
+## Data pipeline for the district coverage / school explorer sections
+
+Those two sections read `data/schools.json`, a compact, dictionary-encoded extract built from a CSV export of the "S&ME School" tab. There's no live/scheduled sync (deliberately — that would require a Google service-account credential stored in this repo); refreshing it is a manual-export-plus-script step:
+
+1. In the Google Sheet, open the **"S&ME School"** tab.
+2. **File → Download → Comma Separated Values (.csv)**.
+3. Save/overwrite it at `data/raw/sme_school.csv`.
+4. Run `python3 scripts/build_data.py data/raw/sme_school.csv <snapshot-date>` from the repo root.
+5. Commit the regenerated `data/schools.json` (and the updated raw CSV, for reproducibility).
+
+The rest of the dashboard (task status, budget, timeline, risks, etc.) is still hand-maintained HTML, unchanged by this pipeline.
 
 ## Source
 

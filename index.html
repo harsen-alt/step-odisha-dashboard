@@ -170,6 +170,41 @@
   .budget-card .d { font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; line-height: 1.45; }
   .budget-card .flagrow { display:flex; align-items:center; gap:6px; margin-top:8px; font-size:0.72rem; color: var(--status-critical); text-transform: uppercase; letter-spacing: 0.03em; }
 
+  /* district heat grid (relative-intensity view, not a geographic map) */
+  .heatgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; }
+  .heatgrid .cell { border-radius: 8px; padding: 9px 6px; text-align: center; line-height: 1.3; }
+  .heatgrid .cell .n { font-weight: 700; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+  .heatgrid .cell .t { font-size: 0.62rem; opacity: 0.92; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* school explorer: filters, table, pager */
+  .filters-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; align-items: center; }
+  .filters-row input[type="search"], .filters-row select {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 10px; font-size: 0.82rem; color: var(--text-primary); font-family: inherit;
+  }
+  .filters-row input[type="search"] { flex: 1 1 220px; min-width: 160px; }
+  .filters-count { font-size: 0.78rem; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+  table.dc-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 640px; }
+  table.dc-table th {
+    text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border);
+    color: var(--text-secondary); font-weight: 600; white-space: nowrap; position: sticky; top: 0; background: var(--surface-1);
+  }
+  table.dc-table td {
+    padding: 7px 12px; border-bottom: 1px solid var(--gridline);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px;
+  }
+  table.dc-table tbody tr:hover { background: var(--page-plane); }
+
+  .pager { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 0.8rem; color: var(--text-secondary); }
+  .pager button {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 10px; cursor: pointer; color: var(--text-primary); font-size: 0.8rem; font-family: inherit;
+  }
+  .pager button:disabled { opacity: 0.4; cursor: default; }
+  .pager button:hover:not(:disabled) { background: var(--page-plane); }
+
   /* risk cards */
   .risks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
   @media (max-width: 760px) { .risks { grid-template-columns: 1fr; } }
@@ -309,20 +344,53 @@
   </section>
 
   <section>
-    <h2 class="sec-title">District-level tracking coverage <span class="hint">— top 10 of 30 districts</span></h2>
-    <div class="card barchart">
-      <div class="row"><div class="name">Mayurbhanj</div><div class="track"><div class="fill" style="width:100%;background:var(--seq-650)" title="144 schools"></div></div><div class="value">144</div></div>
-      <div class="row"><div class="name">Kandhamal</div><div class="track"><div class="fill" style="width:72.9%;background:var(--seq-600)" title="105 schools"></div></div><div class="value">105</div></div>
-      <div class="row"><div class="name">Koraput</div><div class="track"><div class="fill" style="width:66.7%;background:var(--seq-550)" title="96 schools"></div></div><div class="value">96</div></div>
-      <div class="row"><div class="name">Keonjhar</div><div class="track"><div class="fill" style="width:56.3%;background:var(--seq-500)" title="81 schools"></div></div><div class="value">81</div></div>
-      <div class="row"><div class="name">Nabarangpur</div><div class="track"><div class="fill" style="width:54.9%;background:var(--seq-500)" title="79 schools"></div></div><div class="value">79</div></div>
-      <div class="row"><div class="name">Rayagada</div><div class="track"><div class="fill" style="width:54.2%;background:var(--seq-450)" title="78 schools"></div></div><div class="value">78</div></div>
-      <div class="row"><div class="name">Malkangiri</div><div class="track"><div class="fill" style="width:50%;background:var(--seq-450)" title="72 schools"></div></div><div class="value">72</div></div>
-      <div class="row"><div class="name">Sundargarh</div><div class="track"><div class="fill" style="width:44.4%;background:var(--seq-400)" title="64 schools"></div></div><div class="value">64</div></div>
-      <div class="row"><div class="name">Gajapati</div><div class="track"><div class="fill" style="width:33.3%;background:var(--seq-300)" title="48 schools"></div></div><div class="value">48</div></div>
-      <div class="row"><div class="name">Kalahandi</div><div class="track"><div class="fill" style="width:29.2%;background:var(--seq-200)" title="42 schools"></div></div><div class="value">42</div></div>
-      <div class="note">Smallest: Jagatsinghpur &amp; Bhadrak (3 schools each), Kendrapara (4), Puri (5).</div>
-      <div class="note callout">Source: "Cascading (Teachers &amp; MTs)" tab (Active) — the Zone/MT allocation table. These counts sum to <b>1,184 schools</b>, the count this tab explicitly ties Master Trainer and HM/teacher cascade-training deployment to (230 MTs at a 5:1 school:MT ratio), distinct from the 24,000-school figure used for scope/budget above. A district-by-district split for the full 24,000-school scope is not available in any Active tab. Partner-organization mapping also explicitly flags <b>no partner currently available for the Sambalpur zone</b>, and calls out Sundargarh, Sambalpur and Mayurbhanj as large districts needing added partner capacity.</div>
+    <h2 class="sec-title">District-level school coverage <span class="hint">— Grades 6-8, all 30 districts, state-wide</span></h2>
+    <div class="card">
+      <div class="tiles" style="margin-bottom:18px;">
+        <div class="tile"><div class="val" id="dc-total-schools">–</div><div class="lbl">Schools with Gr. 6, 7 or 8</div></div>
+        <div class="tile"><div class="val" id="dc-districts">–</div><div class="lbl">Districts covered</div></div>
+        <div class="tile"><div class="val" id="dc-students">–</div><div class="lbl">Students, all grades (these schools)</div></div>
+        <div class="tile"><div class="val" id="dc-teachers">–</div><div class="lbl">Teachers (these schools)</div></div>
+      </div>
+      <div class="grid2">
+        <div>
+          <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:10px;">Schools by district (all 30, sorted)</div>
+          <div class="barchart" id="dc-barlist" style="max-height:420px;overflow-y:auto;padding-right:4px;">
+            <div class="note">Loading district data…</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:10px;">Relative distribution — district intensity grid</div>
+          <div class="heatgrid" id="dc-heatgrid"></div>
+          <div class="note">Darker tile = more qualifying schools. This is a relative-intensity grid, not a geographic map — districts aren't drawn to their actual shape or position.</div>
+        </div>
+      </div>
+      <div class="note callout" id="dc-source-note">Loading source details…</div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">School explorer <span class="hint">— search and filter individual schools</span></h2>
+    <div class="card">
+      <div class="filters-row">
+        <input type="search" id="dc-search" placeholder="Search school name or UDISE code…" aria-label="Search schools">
+        <select id="dc-district-filter" aria-label="Filter by district"><option value="">All districts</option></select>
+        <select id="dc-block-filter" aria-label="Filter by block"><option value="">All blocks</option></select>
+        <select id="dc-grade-filter" aria-label="Filter by grade">
+          <option value="">Grade 6, 7 or 8</option>
+          <option value="6">Grade 6</option>
+          <option value="7">Grade 7</option>
+          <option value="8">Grade 8</option>
+        </select>
+        <span class="filters-count" id="dc-result-count"></span>
+      </div>
+      <div class="table-wrap">
+        <table class="dc-table" id="dc-table">
+          <thead><tr><th>School</th><th>District</th><th>Block</th><th>Classes</th><th>Students</th><th>Location</th></tr></thead>
+          <tbody id="dc-table-body"><tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;">Loading schools…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="pager" id="dc-pager"></div>
     </div>
   </section>
 
@@ -374,8 +442,194 @@
   </section>
 
   <footer class="pagefoot">
-    Generated from "STEP Odisha_Program Management Sheet: 2026-27" (Google Sheets), scoped to Academic Year 2026-27 only. Every figure on this page is sourced from a tab marked "Active" on the sheet's own Index tab — Hidden tabs (e.g. "District wise no. of schools," "Program Summary-EdI," "Impact Assessment," "Inst. Mat.") were deliberately excluded. The 24,000-school figure is the sheet's own stated scope on the "1. Scope" and "PBL Kit" tabs (both Active); see the Budget section note for how the "Cascading (Teachers &amp; MTs)" tab's 1,184-school cascade-training rollout relates to it. Figures are roll-ups verified directly against the workbook and should still be cross-checked against the live sheet before external use. This repo is public — it contains internal staff and budget data.
+    Generated from "STEP Odisha_Program Management Sheet: 2026-27" (Google Sheets), scoped to Academic Year 2026-27 only. Every figure on this page is sourced from a tab marked "Active" on the sheet's own Index tab — Hidden tabs (e.g. "District wise no. of schools," "Program Summary-EdI," "Impact Assessment," "Inst. Mat.") were deliberately excluded, with one noted exception: the "District-level school coverage" and "School explorer" sections above are sourced from "S&amp;ME School," a tab added to the workbook after the Index tab's own Active/Hidden list was last updated, so it carries no status tag there. The 24,000-school figure is the sheet's own stated scope on the "1. Scope" and "PBL Kit" tabs (both Active); see the Budget section note for how the "Cascading (Teachers &amp; MTs)" tab's 1,184-school cascade-training rollout relates to it — that figure describes this year's cascade-training deployment specifically, not the full state-wide school count shown above. Figures are roll-ups verified directly against the workbook and should still be cross-checked against the live sheet before external use. This repo is public — it contains internal staff and budget data.
   </footer>
+
+  <script>
+  (function () {
+    "use strict";
+    var state = { data: null, filtered: [], page: 1, pageSize: 25 };
+    var SEQ = ["--seq-200", "--seq-300", "--seq-400", "--seq-450", "--seq-500", "--seq-550", "--seq-600", "--seq-650"];
+
+    function fmtNum(n) { return Number(n || 0).toLocaleString("en-IN"); }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    function seqColor(norm) {
+      var i = Math.max(0, Math.min(SEQ.length - 1, Math.round(norm * (SEQ.length - 1))));
+      return "var(" + SEQ[i] + ")";
+    }
+
+    function districtCounts(data) {
+      var counts = data.districts.map(function () { return { schools: 0, students: 0, teachers: 0 }; });
+      data.rows.forEach(function (r) {
+        var c = counts[r[0]];
+        c.schools++; c.students += r[6]; c.teachers += r[7];
+      });
+      return data.districts
+        .map(function (name, i) { return { name: name, schools: counts[i].schools, students: counts[i].students, teachers: counts[i].teachers }; })
+        .sort(function (a, b) { return b.schools - a.schools; });
+    }
+
+    function renderKPIs(data) {
+      var students = 0, teachers = 0;
+      data.rows.forEach(function (r) { students += r[6]; teachers += r[7]; });
+      document.getElementById("dc-total-schools").textContent = fmtNum(data.meta.qualifying);
+      document.getElementById("dc-districts").textContent = data.districts.length;
+      document.getElementById("dc-students").textContent = fmtNum(students);
+      document.getElementById("dc-teachers").textContent = fmtNum(teachers);
+    }
+
+    function renderDistrictChart(data) {
+      var list = districtCounts(data);
+      var max = list[0] ? list[0].schools : 1;
+      var wrap = document.getElementById("dc-barlist");
+      wrap.innerHTML = list.map(function (d) {
+        var pct = (d.schools / max * 100).toFixed(1);
+        var color = seqColor(d.schools / max);
+        return '<div class="row"><div class="name">' + escapeHtml(d.name) + '</div>' +
+          '<div class="track"><div class="fill" style="width:' + pct + '%;background:' + color + '" title="' +
+          escapeHtml(d.name) + ' — ' + fmtNum(d.schools) + ' schools"></div></div>' +
+          '<div class="value">' + fmtNum(d.schools) + "</div></div>";
+      }).join("");
+    }
+
+    function renderHeatGrid(data) {
+      var list = districtCounts(data);
+      var max = list[0] ? list[0].schools : 1;
+      var grid = document.getElementById("dc-heatgrid");
+      grid.innerHTML = list.map(function (d) {
+        var norm = d.schools / max;
+        var color = seqColor(norm);
+        var textColor = norm > 0.45 ? "#fff" : "var(--text-primary)";
+        return '<div class="cell" style="background:' + color + ";color:" + textColor + '" title="' +
+          escapeHtml(d.name) + " — " + fmtNum(d.schools) + " schools, " + fmtNum(d.students) + ' students">' +
+          '<div class="n">' + fmtNum(d.schools) + '</div><div class="t">' + escapeHtml(d.name) + "</div></div>";
+      }).join("");
+    }
+
+    function renderSourceNote(data) {
+      var el = document.getElementById("dc-source-note");
+      el.innerHTML = "<b>Source:</b> " + escapeHtml(data.meta.source) + ", snapshot " + escapeHtml(data.meta.snapshotDate) +
+        ". <b>Filter:</b> " + escapeHtml(data.meta.filterRule) + " — " + fmtNum(data.meta.qualifying) + " of " +
+        fmtNum(data.meta.totalRowsInTab) + " schools in the tab qualify (" + fmtNum(data.meta.excluded) +
+        " excluded, offering only Grade 5 or below). This is the full state-wide S&amp;ME-affiliated school list — a much larger, different-scope figure than the 1,184-school AY2026-27 cascade-training rollout used for Master Trainer deployment elsewhere on this page.";
+    }
+
+    function populateFilterOptions(data) {
+      var distSel = document.getElementById("dc-district-filter");
+      data.districts
+        .map(function (name, idx) { return { name: name, idx: idx }; })
+        .sort(function (a, b) { return a.name.localeCompare(b.name); })
+        .forEach(function (d) {
+          var opt = document.createElement("option");
+          opt.value = d.idx; opt.textContent = d.name;
+          distSel.appendChild(opt);
+        });
+    }
+
+    function updateBlockOptions() {
+      var data = state.data;
+      var blockSel = document.getElementById("dc-block-filter");
+      var distVal = document.getElementById("dc-district-filter").value;
+      blockSel.innerHTML = '<option value="">All blocks</option>';
+      var blockIdxs = new Set();
+      data.rows.forEach(function (r) {
+        if (distVal === "" || String(r[0]) === distVal) blockIdxs.add(r[1]);
+      });
+      Array.from(blockIdxs)
+        .map(function (i) { return { i: i, name: data.blocks[i] }; })
+        .sort(function (a, b) { return a.name.localeCompare(b.name); })
+        .forEach(function (b) {
+          var opt = document.createElement("option");
+          opt.value = b.i; opt.textContent = b.name;
+          blockSel.appendChild(opt);
+        });
+    }
+
+    function applyFilters() {
+      var data = state.data;
+      var q = document.getElementById("dc-search").value.trim().toLowerCase();
+      var distVal = document.getElementById("dc-district-filter").value;
+      var blockVal = document.getElementById("dc-block-filter").value;
+      var gradeVal = document.getElementById("dc-grade-filter").value;
+
+      state.filtered = data.rows.filter(function (r) {
+        if (distVal !== "" && String(r[0]) !== distVal) return false;
+        if (blockVal !== "" && String(r[1]) !== blockVal) return false;
+        if (gradeVal !== "") {
+          var g = parseInt(gradeVal, 10);
+          if (!(r[4] <= g && r[5] >= g)) return false;
+        }
+        if (q) {
+          var hay = (r[2] + " " + r[3]).toLowerCase();
+          if (hay.indexOf(q) === -1) return false;
+        }
+        return true;
+      });
+      state.page = 1;
+      renderTable();
+    }
+
+    function renderTable() {
+      var data = state.data;
+      var rows = state.filtered;
+      var totalPages = Math.max(1, Math.ceil(rows.length / state.pageSize));
+      state.page = Math.min(state.page, totalPages);
+      var start = (state.page - 1) * state.pageSize;
+      var pageRows = rows.slice(start, start + state.pageSize);
+
+      document.getElementById("dc-result-count").textContent = fmtNum(rows.length) + (rows.length === 1 ? " school" : " schools");
+
+      var body = document.getElementById("dc-table-body");
+      body.innerHTML = pageRows.map(function (r) {
+        var loc = r[9] === 1 ? "Urban" : r[9] === 0 ? "Rural" : "—";
+        return "<tr><td title=\"" + escapeHtml(r[2]) + "\">" + escapeHtml(r[2]) + "</td><td>" +
+          escapeHtml(data.districts[r[0]]) + "</td><td>" + escapeHtml(data.blocks[r[1]]) + "</td><td>" +
+          r[4] + "–" + r[5] + "</td><td>" + fmtNum(r[6]) + "</td><td>" + loc + "</td></tr>";
+      }).join("") || '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;">No schools match these filters.</td></tr>';
+
+      var pager = document.getElementById("dc-pager");
+      pager.innerHTML =
+        '<button id="dc-prev"' + (state.page <= 1 ? " disabled" : "") + ">‹ Prev</button>" +
+        "<span>Page " + state.page + " of " + totalPages + "</span>" +
+        '<button id="dc-next"' + (state.page >= totalPages ? " disabled" : "") + ">Next ›</button>";
+      var prevBtn = document.getElementById("dc-prev");
+      var nextBtn = document.getElementById("dc-next");
+      if (prevBtn) prevBtn.addEventListener("click", function () { state.page--; renderTable(); });
+      if (nextBtn) nextBtn.addEventListener("click", function () { state.page++; renderTable(); });
+    }
+
+    function init(data) {
+      state.data = data;
+      renderKPIs(data);
+      renderDistrictChart(data);
+      renderHeatGrid(data);
+      renderSourceNote(data);
+      populateFilterOptions(data);
+      applyFilters();
+      document.getElementById("dc-search").addEventListener("input", applyFilters);
+      document.getElementById("dc-district-filter").addEventListener("change", function () { updateBlockOptions(); applyFilters(); });
+      document.getElementById("dc-block-filter").addEventListener("change", applyFilters);
+      document.getElementById("dc-grade-filter").addEventListener("change", applyFilters);
+    }
+
+    fetch("data/schools.json")
+      .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+      .then(init)
+      .catch(function (err) {
+        var msg = "Could not load school data (data/schools.json): " + err.message;
+        var note = document.getElementById("dc-source-note");
+        if (note) note.textContent = msg;
+        var body = document.getElementById("dc-table-body");
+        if (body) body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--status-critical);padding:20px;">' + msg + "</td></tr>";
+      });
+  })();
+  </script>
 
 </div>
 </div>
