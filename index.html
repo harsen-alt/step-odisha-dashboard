@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STEP Odisha — Program Management Dashboard 2026-27</title>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page-plane:      #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --success-text:   #006300;
+
+    --series-1: #2a78d6; /* blue */
+    --series-2: #eb6834; /* orange */
+    --series-3: #1baf7a; /* aqua */
+
+    --status-good:     #0ca30c;
+    --status-warning:  #fab219;
+    --status-serious:  #ec835a;
+    --status-critical: #d03b3b;
+    --status-neutral:  #c3c2b7;
+
+    --seq-200: #9ec5f4;
+    --seq-300: #6da7ec;
+    --seq-400: #3987e5;
+    --seq-450: #2a78d6;
+    --seq-500: #256abf;
+    --seq-550: #1c5cab;
+    --seq-600: #184f95;
+    --seq-650: #104281;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page-plane:      #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --success-text:   #0ca30c;
+
+      --series-1: #3987e5;
+      --series-2: #d95926;
+      --series-3: #199e70;
+
+      --seq-200: #184f95;
+      --seq-300: #1c5cab;
+      --seq-400: #256abf;
+      --seq-450: #2a78d6;
+      --seq-500: #3987e5;
+      --seq-550: #5598e7;
+      --seq-600: #86b6ef;
+      --seq-650: #9ec5f4;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page-plane:      #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --gridline:       #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --success-text:   #0ca30c;
+
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+
+    --seq-200: #184f95;
+    --seq-300: #1c5cab;
+    --seq-400: #256abf;
+    --seq-450: #2a78d6;
+    --seq-500: #3987e5;
+    --seq-550: #5598e7;
+    --seq-600: #86b6ef;
+    --seq-650: #9ec5f4;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--page-plane);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--text-primary);
+  }
+  .viz-root { background: var(--page-plane); min-height: 100vh; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 20px 80px; }
+
+  header.top { margin-bottom: 28px; }
+  header.top h1 { font-size: 1.7rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.top p.sub { color: var(--text-secondary); margin: 0; font-size: 0.95rem; }
+  header.top .asof { color: var(--text-muted); font-size: 0.82rem; margin-top: 6px; }
+
+  section { margin-bottom: 36px; }
+  h2.sec-title {
+    font-size: 1.05rem;
+    margin: 0 0 14px;
+    color: var(--text-primary);
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  h2.sec-title .hint { font-size: 0.8rem; color: var(--text-muted); font-weight: 400; }
+
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+
+  /* Stat tiles */
+  .tiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+  @media (max-width: 900px) { .tiles { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 560px) { .tiles { grid-template-columns: repeat(2, 1fr); } }
+  .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .tile .val { font-size: 1.5rem; font-weight: 600; line-height: 1.1; }
+  .tile .lbl { color: var(--text-secondary); font-size: 0.78rem; margin-top: 4px; }
+  .tile .flag { color: var(--status-critical); font-size: 0.72rem; margin-top: 4px; }
+
+  /* two-col grid for chart cards */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* Bar chart (css-based, horizontal) */
+  .barchart .row { display: grid; grid-template-columns: 140px 1fr 64px; align-items: center; gap: 10px; margin: 9px 0; }
+  .barchart .row .name { font-size: 0.82rem; color: var(--text-secondary); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .barchart .row .track { background: var(--gridline); border-radius: 4px; height: 14px; position: relative; }
+  .barchart .row .fill { height: 14px; border-radius: 4px; position: relative; transition: filter 0.15s; }
+  .barchart .row .fill:hover { filter: brightness(1.08); }
+  .barchart .row .value { font-size: 0.8rem; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .barchart .row .fill[title] { cursor: default; }
+
+  /* legend */
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; font-size: 0.8rem; color: var(--text-secondary); }
+  .legend .item { display: flex; align-items: center; gap: 6px; }
+  .legend .swatch { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+  .legend .icon { font-size: 0.85rem; }
+
+  /* donut via conic-gradient */
+  .donut-wrap { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .donut { width: 150px; height: 150px; border-radius: 50%; flex: none; position: relative; }
+  .donut .hole { position: absolute; inset: 22px; border-radius: 50%; background: var(--surface-1); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .donut .hole .n { font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .donut .hole .t { font-size: 0.65rem; color: var(--text-muted); text-align: center; }
+
+  .note { font-size: 0.8rem; color: var(--text-muted); margin-top: 10px; line-height: 1.5; }
+  .note b { color: var(--text-secondary); }
+
+  /* grouped bars for budget */
+  .budget-group { display: grid; grid-template-columns: 110px 1fr; gap: 12px; align-items: center; margin: 14px 0; }
+  .budget-group .glabel { font-size: 0.85rem; color: var(--text-primary); font-weight: 600; text-align: right; }
+  .budget-bars .brow { display: grid; grid-template-columns: 90px 1fr 100px; gap: 8px; align-items: center; margin: 4px 0; }
+  .budget-bars .brow .yr { font-size: 0.72rem; color: var(--text-muted); }
+  .budget-bars .track { background: var(--gridline); border-radius: 4px; height: 12px; }
+  .budget-bars .fill { height: 12px; border-radius: 4px; }
+  .budget-bars .amt { font-size: 0.75rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+  /* risk cards */
+  .risks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  @media (max-width: 760px) { .risks { grid-template-columns: 1fr; } }
+  .risk { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; display: flex; gap: 10px; }
+  .risk .ic { flex: none; font-size: 1.05rem; line-height: 1.4; }
+  .risk .ic.critical { color: var(--status-critical); }
+  .risk .ic.warning { color: var(--status-warning); }
+  .risk .body .t { font-size: 0.86rem; font-weight: 600; margin-bottom: 3px; }
+  .risk .body .d { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45; }
+  .risk .body .lvl { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 4px; }
+
+  /* timeline */
+  .tl { border-left: 2px solid var(--baseline); margin-left: 8px; padding-left: 20px; }
+  .tl .ev { position: relative; margin-bottom: 18px; }
+  .tl .ev::before { content: ""; position: absolute; left: -25px; top: 3px; width: 9px; height: 9px; border-radius: 50%; background: var(--series-1); border: 2px solid var(--surface-1); }
+  .tl .ev.due::before { background: var(--status-critical); }
+  .tl .ev.done::before { background: var(--status-good); }
+  .tl .ev.gap::before { background: var(--status-warning); }
+  .tl .ev .d { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+  .tl .ev .t { font-size: 0.88rem; font-weight: 600; margin: 2px 0 3px; }
+  .tl .ev .x { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; }
+
+  table.tbl { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  table.tbl th { text-align: left; color: var(--text-muted); font-weight: 500; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; padding: 6px 10px; border-bottom: 1px solid var(--gridline); }
+  table.tbl td { padding: 7px 10px; border-bottom: 1px solid var(--gridline); color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  table.tbl td.strong { color: var(--text-primary); font-weight: 600; }
+
+  footer.pagefoot { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--gridline); color: var(--text-muted); font-size: 0.78rem; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+<div class="wrap">
+
+  <header class="top">
+    <h1>STEP Odisha — Program Management Dashboard</h1>
+    <p class="sub">Project-Based Learning (PBL) program · Mantra4Change × Odisha School &amp; Mass Education Dept., OSEPA, SCERT · AY 2026-27</p>
+    <p class="asof">Source: "STEP Odisha_Program Management Sheet: 2026-27" (Google Sheets, 38 tabs) · Snapshot as of 2026-08-13</p>
+  </header>
+
+  <section>
+    <div class="tiles">
+      <div class="tile"><div class="val">30</div><div class="lbl">Districts</div></div>
+      <div class="tile"><div class="val">11</div><div class="lbl">Zones</div></div>
+      <div class="tile"><div class="val">1,184</div><div class="lbl">Schools (confirmed)</div></div>
+      <div class="tile"><div class="val">230</div><div class="lbl">Master Trainers</div></div>
+      <div class="tile"><div class="val">₹91.7L</div><div class="lbl">AY25-26 PBL spend</div></div>
+      <div class="tile"><div class="val">24,000</div><div class="lbl">Schools per "Outcome goal" tab</div><div class="flag">⚠ 20× stale vs 1,184</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">Task status <span class="hint">— main tracker vs. content pipeline</span></h2>
+    <div class="grid2">
+
+      <div class="card">
+        <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:10px;">Project Tracker (~50 activity rows)</div>
+        <div class="donut-wrap">
+          <div class="donut" style="background: conic-gradient(var(--status-good) 0% 40%, var(--status-warning) 40% 44%, var(--status-neutral) 44% 100%);">
+            <div class="hole"><div class="n">40%</div><div class="t">drafted</div></div>
+          </div>
+          <div class="legend" style="flex-direction:column;align-items:flex-start;">
+            <div class="item"><span class="icon">✓</span><span class="swatch" style="background:var(--status-good)"></span>1st Draft Completed — 20 rows (40%)</div>
+            <div class="item"><span class="icon">◐</span><span class="swatch" style="background:var(--status-warning)"></span>Ongoing — 2 rows (4%)</div>
+            <div class="item"><span class="icon">•</span><span class="swatch" style="background:var(--status-neutral)"></span>No status logged — 28 rows (56%)</div>
+          </div>
+        </div>
+        <div class="note">Over half of main-tracker rows have no status update — mostly Logistics sub-tasks for district/block-level orientation.</div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:10px;">Lesson-plan content pipeline (~140 rows, Math/Science/Odia/SST, Gr. 6-8)</div>
+        <div class="donut-wrap">
+          <div class="donut" style="background: conic-gradient(var(--status-good) 0% 65%, var(--status-warning) 65% 71.5%, var(--status-serious) 71.5% 75.5%, var(--status-critical) 75.5% 78%, var(--status-neutral) 78% 100%);">
+            <div class="hole"><div class="n">65%</div><div class="t">finalised</div></div>
+          </div>
+          <div class="legend" style="flex-direction:column;align-items:flex-start;">
+            <div class="item"><span class="icon">✓</span><span class="swatch" style="background:var(--status-good)"></span>Finalised — 65%</div>
+            <div class="item"><span class="icon">◐</span><span class="swatch" style="background:var(--status-warning)"></span>In review (+ incorp.) — 6.5%</div>
+            <div class="item"><span class="icon">▲</span><span class="swatch" style="background:var(--status-serious)"></span>In creation — 4%</div>
+            <div class="item"><span class="icon">✕</span><span class="swatch" style="background:var(--status-critical)"></span>Not started — 2.5%</div>
+            <div class="item"><span class="icon">•</span><span class="swatch" style="background:var(--status-neutral)"></span>No data yet — ~22%</div>
+          </div>
+        </div>
+        <div class="note">Grades 7-8 are almost fully finalised; the "no data yet" slice is concentrated in <b>Grade 6</b> — see Content Progress below.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">Content progress by grade <span class="hint">— % of lesson-plan projects finalised</span></h2>
+    <div class="card barchart">
+      <div class="row">
+        <div class="name">Grade 8</div>
+        <div class="track"><div class="fill" style="width:92%;background:var(--seq-600)" title="Grade 8 — 92% finalised"></div></div>
+        <div class="value">92%</div>
+      </div>
+      <div class="row">
+        <div class="name">Grade 7</div>
+        <div class="track"><div class="fill" style="width:88%;background:var(--seq-500)" title="Grade 7 — 88% finalised"></div></div>
+        <div class="value">88%</div>
+      </div>
+      <div class="row">
+        <div class="name">Grade 6 <span style="color:var(--status-critical);font-weight:600;">⚠</span></div>
+        <div class="track"><div class="fill" style="width:20%;background:var(--seq-300)" title="Grade 6 — ~20% finalised, most SST/Odia projects blank"></div></div>
+        <div class="value">~20%</div>
+      </div>
+      <div class="note"><b>Risk:</b> Grade 6 SST (Projects 2-8) and Odia Literacy (Projects 3-8) are almost entirely unpopulated while Grades 7-8 are fully finalised and translated — a real risk to on-time Grade 6 rollout.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">Timeline <span class="hint">— relative to snapshot date, 2026-08-13</span></h2>
+    <div class="card">
+      <div class="tl">
+        <div class="ev done">
+          <div class="d">6 Aug 2026 → Completed</div>
+          <div class="t">Grade 7 Maths Project 1 — translation review completed on time</div>
+        </div>
+        <div class="ev done">
+          <div class="d">11 Aug 2026 → Completed</div>
+          <div class="t">Grade 7 Science Project 2 — translation review completed on time</div>
+        </div>
+        <div class="ev due">
+          <div class="d">13 Aug 2026 — due today</div>
+          <div class="t">Grade 8 Maths Project 2 ("The Quilt Pattern Lab") — still "In Review"</div>
+        </div>
+        <div class="ev">
+          <div class="d">Mid–late Aug 2026</div>
+          <div class="t">Master Trainer offline training — two batches (15-17 &amp; 19-21 Aug)</div>
+          <div class="x">Program should currently be entering the first PBL implementation module in schools.</div>
+        </div>
+        <div class="ev gap">
+          <div class="d">Since mid-June 2026 — gap</div>
+          <div class="t">Weekly Meeting–MoM log has not been updated</div>
+          <div class="x">Only 2 weeks of minutes exist (8-12 &amp; 15-19 June); a ~2-month blind spot heading into rollout.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">Scale — schools by district <span class="hint">top 10 of 30 districts, 1,184 total</span></h2>
+    <div class="card barchart">
+      <div class="row"><div class="name">Mayurbhanj</div><div class="track"><div class="fill" style="width:100%;background:var(--seq-650)" title="144 schools"></div></div><div class="value">144</div></div>
+      <div class="row"><div class="name">Kandhamal</div><div class="track"><div class="fill" style="width:72.9%;background:var(--seq-600)" title="105 schools"></div></div><div class="value">105</div></div>
+      <div class="row"><div class="name">Koraput</div><div class="track"><div class="fill" style="width:66.7%;background:var(--seq-550)" title="96 schools"></div></div><div class="value">96</div></div>
+      <div class="row"><div class="name">Keonjhar</div><div class="track"><div class="fill" style="width:56.3%;background:var(--seq-500)" title="81 schools"></div></div><div class="value">81</div></div>
+      <div class="row"><div class="name">Nabarangpur</div><div class="track"><div class="fill" style="width:54.9%;background:var(--seq-500)" title="79 schools"></div></div><div class="value">79</div></div>
+      <div class="row"><div class="name">Rayagada</div><div class="track"><div class="fill" style="width:54.2%;background:var(--seq-450)" title="78 schools"></div></div><div class="value">78</div></div>
+      <div class="row"><div class="name">Malkangiri</div><div class="track"><div class="fill" style="width:50%;background:var(--seq-450)" title="72 schools"></div></div><div class="value">72</div></div>
+      <div class="row"><div class="name">Sundargarh</div><div class="track"><div class="fill" style="width:44.4%;background:var(--seq-400)" title="64 schools"></div></div><div class="value">64</div></div>
+      <div class="row"><div class="name">Gajapati</div><div class="track"><div class="fill" style="width:33.3%;background:var(--seq-300)" title="48 schools"></div></div><div class="value">48</div></div>
+      <div class="row"><div class="name">Kalahandi</div><div class="track"><div class="fill" style="width:29.2%;background:var(--seq-200)" title="42 schools"></div></div><div class="value">42</div></div>
+      <div class="note">Smallest: Jagatsinghpur &amp; Bhadrak (3 schools each), Kendrapara (4), Puri (5). Partner-organization mapping explicitly flags <b>no partner currently available for the Sambalpur zone</b>, and calls out Sundargarh, Sambalpur and Mayurbhanj as large districts needing added partner capacity.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">Budget <span class="hint">actuals from "Program Summary-EdI" tab — year over year</span></h2>
+    <div class="card">
+      <div class="budget-group">
+        <div class="glabel">PBL</div>
+        <div class="budget-bars">
+          <div class="brow"><div class="yr">AY24-25</div><div class="track"><div class="fill" style="width:5.9%;background:var(--series-1)" title="₹5,36,160 · 80 schools"></div></div><div class="amt">₹5.4L · 80 sch.</div></div>
+          <div class="brow"><div class="yr">AY25-26</div><div class="track"><div class="fill" style="width:100%;background:var(--series-2)" title="₹91,66,624 · 1,184 schools"></div></div><div class="amt">₹91.7L · 1,184 sch.</div></div>
+        </div>
+      </div>
+      <div class="budget-group">
+        <div class="glabel">BaLA</div>
+        <div class="budget-bars">
+          <div class="brow"><div class="yr">AY24-25</div><div class="track"><div class="fill" style="width:46.2%;background:var(--series-1)" title="₹42,40,000 · 106 schools"></div></div><div class="amt">₹42.4L · 106 sch.</div></div>
+          <div class="brow"><div class="yr">AY25-26</div><div class="track"><div class="fill" style="width:74.2%;background:var(--series-2)" title="₹68,00,000 · 170 schools"></div></div><div class="amt">₹68.0L · 170 sch.</div></div>
+        </div>
+      </div>
+      <div class="budget-group">
+        <div class="glabel">Sports</div>
+        <div class="budget-bars">
+          <div class="brow"><div class="yr">AY25-26</div><div class="track"><div class="fill" style="width:6.5%;background:var(--series-3)" title="₹6,00,000 · 100 schools · new pilot"></div></div><div class="amt">₹6.0L · 100 sch.</div></div>
+          <div class="brow"><div class="yr" style="visibility:hidden">.</div><div class="note" style="margin:0;">new pilot, 20 districts — no prior-year baseline</div></div>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="item"><span class="swatch" style="background:var(--series-1)"></span>AY2024-25</div>
+        <div class="item"><span class="swatch" style="background:var(--series-2)"></span>AY2025-26</div>
+        <div class="item"><span class="swatch" style="background:var(--series-3)"></span>New in AY2025-26</div>
+      </div>
+      <div class="note">
+        <b>Cross-check:</b> PBL Kit unit cost (₹7,660/school) × 1,184 schools ≈ ₹90.65L — nearly identical to the actual ₹91.7L reported, confirming 1,184 schools is the real budget scale.
+        The PBL Kit tab's own headline total of <b>₹18.38 crore</b> uses the stale 24,000-school figure and is ~20× overstated.<br>
+        MT Training budget: <b>₹9,92,700</b> (400 participants, 2-day residential). Teacher Training (Cascading Mode): <b>₹0 — not yet budgeted.</b>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">Task ownership <span class="hint">— tasks owned, Project Tracker + Instructional Materials tabs</span></h2>
+    <div class="card barchart">
+      <div class="row"><div class="name">Subhankar</div><div class="track"><div class="fill" style="width:100%;background:var(--seq-600)" title="30 tasks owned"></div></div><div class="value">30</div></div>
+      <div class="row"><div class="name">Ananya</div><div class="track"><div class="fill" style="width:53.3%;background:var(--seq-450)" title="16 tasks owned"></div></div><div class="value">16</div></div>
+      <div class="row"><div class="name">Aarfin</div><div class="track"><div class="fill" style="width:36.7%;background:var(--seq-350, var(--seq-400))" title="11 tasks owned"></div></div><div class="value">11</div></div>
+      <div class="row"><div class="name">Harsen</div><div class="track"><div class="fill" style="width:23.3%;background:var(--seq-300)" title="7 tasks owned"></div></div><div class="value">7</div></div>
+      <div class="row"><div class="name">Soumya</div><div class="track"><div class="fill" style="width:23.3%;background:var(--seq-300)" title="7 tasks owned"></div></div><div class="value">7</div></div>
+      <div class="note">Sushree appears in ~48 rows but almost entirely as a <i>reviewer</i> sign-off, not a task owner, so is tracked separately from the owner counts above. <b>Bus-factor risk:</b> Subhankar owns the largest single share of tracked tasks — strategy, all lesson plans across 6 subject/grade combinations, the Ed Plan timeline, and cascading execution.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">Risks &amp; gaps</h2>
+    <div class="risks">
+      <div class="risk"><div class="ic critical">✕</div><div class="body"><div class="t">District/block orientation stalled</div><div class="d">No Session Plan, PPT, or Logistics owner logged for District or Block Official orientation, while state-level (MSTF, PBL Unit) orientation is fully complete.</div><div class="lvl">Critical</div></div></div>
+      <div class="risk"><div class="ic critical">✕</div><div class="body"><div class="t">Grade 6 content lag</div><div class="d">Grade 6 SST and Odia Literacy projects are almost entirely unpopulated versus fully finalised Grades 7-8.</div><div class="lvl">Critical</div></div></div>
+      <div class="risk"><div class="ic warning">▲</div><div class="body"><div class="t">Govt. Engagement Tracker empty</div><div class="d">Headers exist (Department, Officer, Relationship Status, Last Interaction) but zero rows of real data, despite government relationship-building being a stated priority.</div><div class="lvl">Warning</div></div></div>
+      <div class="risk"><div class="ic warning">▲</div><div class="body"><div class="t">No partner org for Sambalpur zone</div><div class="d">Explicit sheet comment: no partner currently mapped for Sambalpur; Sundargarh and Mayurbhanj also flagged as large districts needing more partner capacity.</div><div class="lvl">Warning</div></div></div>
+      <div class="risk"><div class="ic warning">▲</div><div class="body"><div class="t">Weekly MoM cadence stopped</div><div class="d">Only 2 weeks of meeting minutes logged (early-mid June); no visible record since, right as implementation begins.</div><div class="lvl">Warning</div></div></div>
+      <div class="risk"><div class="ic warning">▲</div><div class="body"><div class="t">Stale scale figure drives budget error</div><div class="d">"Outcome goal" tab's 24,000-school figure (vs. confirmed 1,184) inflates the PBL Kit tab's projected total to ₹18.38 crore, ~20× the real budget scale.</div><div class="lvl">Warning</div></div></div>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    Generated from "STEP Odisha_Program Management Sheet: 2026-27" (Google Sheets). Figures are approximate roll-ups from a 38-tab workbook and should be cross-checked against the live sheet before external use. This repo is private — contains internal staff and budget data.
+  </footer>
+
+</div>
+</div>
+</body>
+</html>
