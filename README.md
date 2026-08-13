@@ -8,18 +8,18 @@ A static analytics dashboard summarizing the **STEP Odisha_Program Management Sh
 
 Live at: https://harsen-alt.github.io/step-odisha-dashboard/
 
-Scoped to **Academic Year 2026-27 only** — prior-year comparisons have been dropped per program-team direction, and the school count uses the sheet's **24,000-school** "1. Scope" tab figure rather than the smaller 1,184-school cascade-training count.
+Scoped to **Academic Year 2026-27 only** — prior-year comparisons have been dropped per program-team direction. The top-line Schools/Head Masters/Teachers KPI tiles and the PBL Kit budget line use the **17,633-school** "S&ME School" tab count (schools offering Grade 6, 7, and/or 8), in place of the sheet's own 24,000-school "1. Scope" tab figure — see the note below.
 
 **Every figure is sourced only from tabs marked "Active" on the sheet's own Index tab.** Hidden tabs ("District wise no. of schools," "Program Summary-EdI," "Impact Assessment," "Impl. Timeline," "Inst. Mat.," and others) were deliberately excluded, per explicit request. Re-deriving the dashboard this way corrected two things that an earlier draft got wrong from hidden-tab data: there is **no Grade 6 content lag** (all three grades sit at an even 82.1% finalised), and Master Trainer training is scheduled for **September 2026**, not mid-August as first reported.
 
 ## What's covered
 
-- AY2026-27 program scale (30 districts, 11 zones, 24,000 schools, 230 master trainers)
+- AY2026-27 program scale (30 districts, 11 zones, 17,633 schools, 230 master trainers)
 - Task status: the "Program Index" activity tracker vs. the lesson-plan content pipeline ("Project Tracker" + "Revised Project Tracker" tabs)
 - Content-creation progress by grade (6-8) — verified even across all three grades, no lag
 - Rollout timeline: recent deadlines, what's due, September MT/cascade training dates, and a MoM logging gap since mid-June
 - **District-level school coverage** and a searchable **school explorer**, covering all 30 districts and ~17,600 individual schools state-wide that offer Grade 6, 7, and/or 8 — from the "S&ME School" tab (see below)
-- AY2026-27 budget: PBL Kit total, MT training budget, and the still-unbudgeted Teacher Training (Cascading) line
+- AY2026-27 budget: PBL Kit total (recomputed on the 17,633-school count), MT training budget, and the still-unbudgeted Teacher Training (Cascading) line
 - Task ownership by staff member (from Active tabs' own "Owner" columns), and a bus-factor flag
 - Open risks and gaps, each tied to a specific Active tab
 
@@ -27,9 +27,11 @@ Scoped to **Academic Year 2026-27 only** — prior-year comparisons have been dr
 
 The source sheet uses several different school-count scopes across its tabs, describing different things rather than disagreeing:
 
-- **24,000 schools** — the "1. Scope" and "PBL Kit" tabs' state-wide target/budget figure (used for the top-line KPIs and Budget section).
-- **1,184 schools** — the "Cascading (Teachers & MTs)" tab's figure for this year's actual Master Trainer and HM/teacher cascade-training deployment (used in the Budget section's basis note).
-- **17,633 schools** — the district-level school coverage and school explorer sections' figure: every school in the "S&ME School" tab (17,657 schools state-wide) that offers Grade 6, 7, and/or 8 (`Class From <= 8 and Class To >= 6`). This is the full state-wide eligible-school universe, not a rollout or budget scope — by far the largest of the three figures, and not directly comparable to the other two.
+- **17,633 schools** — every school in the "S&ME School" tab (17,657 schools state-wide) that offers Grade 6, 7, and/or 8 (`Class From <= 8 and Class To >= 6`). Used for the top-line Schools/Head Masters (1/school)/Teachers (2/school) KPI tiles, the PBL Kit budget line (₹7,660/school → ₹13.51 Cr), and the district-level school coverage / school explorer sections.
+- **24,000 schools** — the "1. Scope" and "PBL Kit" tabs' own state-wide target/budget figure. The sheet's own PBL Kit total against this figure is ~₹18.38 Cr; this dashboard no longer uses either number directly, but the Budget section's basis note shows both for comparison.
+- **1,184 schools** — the "Cascading (Teachers & MTs)" tab's figure for this year's actual Master Trainer and HM/teacher cascade-training deployment (referenced in the Budget section's basis note).
+
+None of these are errors — they describe different scopes (full state-wide Grade 6-8 eligibility vs. the sheet's own broader target scope vs. this year's actual cascade-training rollout).
 
 ## Data pipeline for the district coverage / school explorer sections
 

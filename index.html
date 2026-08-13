@@ -244,12 +244,12 @@
     <div class="tiles">
       <div class="tile"><div class="val">30</div><div class="lbl">Districts</div></div>
       <div class="tile"><div class="val">11</div><div class="lbl">Zones</div></div>
-      <div class="tile"><div class="val">24,000</div><div class="lbl">Schools — AY2026-27 scope</div></div>
-      <div class="tile"><div class="val">24,000</div><div class="lbl">Head Masters (HMs)</div></div>
-      <div class="tile"><div class="val">48,000</div><div class="lbl">Teachers targeted (2/school)</div></div>
+      <div class="tile"><div class="val" id="top-schools">17,633</div><div class="lbl">Schools — AY2026-27 scope</div></div>
+      <div class="tile"><div class="val" id="top-hms">17,633</div><div class="lbl">Head Masters (HMs)</div></div>
+      <div class="tile"><div class="val" id="top-teachers">35,266</div><div class="lbl">Teachers targeted (2/school)</div></div>
       <div class="tile"><div class="val">~15,00,000</div><div class="lbl">Students reached</div></div>
       <div class="tile"><div class="val">230</div><div class="lbl">Master Trainers deployed</div></div>
-      <div class="tile"><div class="val">₹18.38 Cr</div><div class="lbl">PBL Kit budget basis</div></div>
+      <div class="tile"><div class="val" id="top-pblkit">₹13.51 Cr</div><div class="lbl">PBL Kit budget basis</div></div>
     </div>
   </section>
 
@@ -399,8 +399,8 @@
     <div class="grid3">
       <div class="budget-card">
         <div class="t">PBL Kits</div>
-        <div class="v">₹18.38 Cr</div>
-        <div class="d">₹7,660/school × 24,000 schools (AY2026-27 scope). Cardboard boxes, chart paper &amp; stationery for hands-on PBL activities — to be arranged by each school from available budget heads.</div>
+        <div class="v" id="budget-pblkit">₹13.51 Cr</div>
+        <div class="d">₹7,660/school × 17,633 schools (schools offering Gr. 6, 7, and/or 8, from the "S&amp;ME School" tab). Cardboard boxes, chart paper &amp; stationery for hands-on PBL activities — to be arranged by each school from available budget heads.</div>
       </div>
       <div class="budget-card">
         <div class="t">MT Residential Training</div>
@@ -415,7 +415,7 @@
       </div>
     </div>
     <div class="note callout" style="margin-top:14px;">
-      <b>Basis note:</b> ₹18.38 Cr is the source sheet's own stated total on the "PBL Kit" tab (Active) — "Total budget for ~24,000 schools." Worth knowing: the same workbook's "Cascading (Teachers &amp; MTs)" tab (also Active) explicitly sizes actual AY2026-27 Master Trainer and HM/teacher cascade-training deployment to <b>1,184 schools</b> instead. Both figures are Active-tab-documented; they simply describe different scopes (state-wide kit budget vs. current cascade-training rollout), worth keeping in mind together when using either number externally.
+      <b>Basis note:</b> The ₹7,660/school kit rate comes from the source sheet's "PBL Kit" tab (Active), which itself states a total of ~₹18.38 Cr against that tab's own 24,000-school "1. Scope" figure. This dashboard now applies that same per-school rate to <b>17,633 schools</b> — schools offering Grade 6, 7, and/or 8, from the "S&amp;ME School" tab — giving <b>₹13.51 Cr</b>; that total is recomputed here, not stated directly in the sheet. A third figure worth knowing: the same workbook's "Cascading (Teachers &amp; MTs)" tab (also Active) sizes actual AY2026-27 Master Trainer and HM/teacher cascade-training deployment to <b>1,184 schools</b> instead. None of the three figures are errors — they simply describe different scopes.
     </div>
   </section>
 
@@ -442,7 +442,7 @@
   </section>
 
   <footer class="pagefoot">
-    Generated from "STEP Odisha_Program Management Sheet: 2026-27" (Google Sheets), scoped to Academic Year 2026-27 only. Every figure on this page is sourced from a tab marked "Active" on the sheet's own Index tab — Hidden tabs (e.g. "District wise no. of schools," "Program Summary-EdI," "Impact Assessment," "Inst. Mat.") were deliberately excluded, with one noted exception: the "District-level school coverage" and "School explorer" sections above are sourced from "S&amp;ME School," a tab added to the workbook after the Index tab's own Active/Hidden list was last updated, so it carries no status tag there. The 24,000-school figure is the sheet's own stated scope on the "1. Scope" and "PBL Kit" tabs (both Active); see the Budget section note for how the "Cascading (Teachers &amp; MTs)" tab's 1,184-school cascade-training rollout relates to it — that figure describes this year's cascade-training deployment specifically, not the full state-wide school count shown above. Figures are roll-ups verified directly against the workbook and should still be cross-checked against the live sheet before external use. This repo is public — it contains internal staff and budget data.
+    Generated from "STEP Odisha_Program Management Sheet: 2026-27" (Google Sheets), scoped to Academic Year 2026-27 only. Every figure on this page is sourced from a tab marked "Active" on the sheet's own Index tab — Hidden tabs (e.g. "District wise no. of schools," "Program Summary-EdI," "Impact Assessment," "Inst. Mat.") were deliberately excluded, with one noted exception: the "S&amp;ME School" tab, used for the top-of-page Schools/Head Masters/Teachers KPI tiles, the PBL Kit budget line, and the "District-level school coverage" and "School explorer" sections. It was added to the workbook after the Index tab's own Active/Hidden list was last updated, so it carries no status tag there. Those KPI tiles and the PBL Kit line use that tab's <b>17,633</b>-school count (schools offering Grade 6, 7, and/or 8) in place of the sheet's own <b>24,000</b>-school "1. Scope"/"PBL Kit" figure; see the Budget section's basis note for how the resulting ₹13.51 Cr relates to the sheet's own stated ₹18.38 Cr, and to the "Cascading (Teachers &amp; MTs)" tab's separate <b>1,184</b>-school AY2026-27 cascade-training rollout figure — none of the three school-count figures are errors, they describe different scopes. Figures are roll-ups verified directly against the workbook and should still be cross-checked against the live sheet before external use. This repo is public — it contains internal staff and budget data.
   </footer>
 
   <script>
@@ -482,6 +482,25 @@
       document.getElementById("dc-districts").textContent = data.districts.length;
       document.getElementById("dc-students").textContent = fmtNum(students);
       document.getElementById("dc-teachers").textContent = fmtNum(teachers);
+    }
+
+    // Top-of-page Schools/HMs/Teachers KPI tiles and the PBL Kit budget line are
+    // pinned to the same "S&ME School" Grade 6-8 count as the sections above, so
+    // they stay in sync if data/schools.json is regenerated. Falls back to the
+    // static HTML values already in the markup if this fetch/script fails.
+    function renderTopKPIs(data) {
+      var schoolCount = data.meta.qualifying;
+      var el = document.getElementById("top-schools");
+      if (el) el.textContent = fmtNum(schoolCount);
+      el = document.getElementById("top-hms");
+      if (el) el.textContent = fmtNum(schoolCount);
+      el = document.getElementById("top-teachers");
+      if (el) el.textContent = fmtNum(schoolCount * 2);
+      var pblCr = (schoolCount * 7660 / 1e7).toFixed(2) + " Cr";
+      el = document.getElementById("top-pblkit");
+      if (el) el.textContent = "₹" + pblCr;
+      el = document.getElementById("budget-pblkit");
+      if (el) el.textContent = "₹" + pblCr;
     }
 
     function renderDistrictChart(data) {
@@ -607,6 +626,7 @@
     function init(data) {
       state.data = data;
       renderKPIs(data);
+      renderTopKPIs(data);
       renderDistrictChart(data);
       renderHeatGrid(data);
       renderSourceNote(data);
