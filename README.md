@@ -33,9 +33,26 @@ The source sheet uses several different school-count scopes across its tabs, des
 
 None of these are errors — they describe different scopes (full state-wide Grade 6-8 eligibility vs. the sheet's own broader target scope vs. this year's actual cascade-training rollout).
 
-## Data pipeline for the district coverage / school explorer sections
+## Live data pipeline (district coverage / school explorer / top KPI tiles / PBL Kit budget)
 
-Those two sections read `data/schools.json`, a compact, dictionary-encoded extract built from a CSV export of the "S&ME School" tab. There's no live/scheduled sync (deliberately — that would require a Google service-account credential stored in this repo); refreshing it is a manual-export-plus-script step:
+Those sections read `data/schools.json`, a compact, dictionary-encoded extract of the "S&ME School" tab. A scheduled GitHub Action (`.github/workflows/sync-data.yml`) re-fetches that tab roughly every 15 minutes via a read-only Google service account, rebuilds `data/schools.json`, and commits it if anything changed — which auto-redeploys the page (this repo's GitHub Pages is the "legacy" build type: any push to `main` redeploys). An open browser tab also polls `data/schools.json` every 3 minutes so it picks up a change without a manual reload — see the "Live — checked HH:MM:SS" indicator above the District-level school coverage heading.
+
+**No polling for edits faster than that, and no push-on-edit** — this is "checks every ~15 min," not instant. That tradeoff was chosen deliberately to keep the source sheet itself completely private (the service account only has read access to this one sheet; nothing about the sheet's sharing settings changed).
+
+### One-time setup (required before the Action will run)
+
+The Action skips cleanly (not a failure) until this is done:
+
+1. **Google Cloud**: create a project (or reuse one) at [console.cloud.google.com](https://console.cloud.google.com), enable the **Google Sheets API** for it (APIs & Services → Library → search "Google Sheets API" → Enable).
+2. **Service account**: APIs & Services → Credentials → Create Credentials → Service Account. No IAM roles needed — access is granted via sharing the sheet directly (next step). Note its email, e.g. `something@project-id.iam.gserviceaccount.com`.
+3. **Key**: open the service account → Keys → Add Key → Create new key → JSON. This downloads a `.json` file — treat it like a password.
+4. **Share the sheet**: in "STEP Odisha_Program Management Sheet: 2026-27," Share → paste the service account's email → Viewer. The sheet itself stays otherwise private/unpublished.
+5. **GitHub secret**: in this repo, Settings → Secrets and variables → Actions → New repository secret → name it `GOOGLE_SERVICE_ACCOUNT_JSON` → paste the entire contents of the downloaded JSON key file as the value.
+6. Trigger a run once by hand (Actions tab → "Sync dashboard data from Google Sheet" → Run workflow) to confirm it succeeds, then it runs on its own from then on.
+
+### Manual/offline fallback
+
+`scripts/build_data.py` still works standalone if you ever need a one-off refresh without the Action (e.g. the service account is mid-setup, or you want to double-check a specific export):
 
 1. In the Google Sheet, open the **"S&ME School"** tab.
 2. **File → Download → Comma Separated Values (.csv)**.
@@ -43,7 +60,9 @@ Those two sections read `data/schools.json`, a compact, dictionary-encoded extra
 4. Run `python3 scripts/build_data.py data/raw/sme_school.csv <snapshot-date>` from the repo root.
 5. Commit the regenerated `data/schools.json` (and the updated raw CSV, for reproducibility).
 
-The rest of the dashboard (task status, budget, timeline, risks, etc.) is still hand-maintained HTML, unchanged by this pipeline.
+Both paths (the Action's `fetch_and_build.py` and the manual `build_data.py`) share the same filtering/aggregation logic in `scripts/dashboard_data.py`, so they produce identical output for the same underlying rows.
+
+The rest of the dashboard (task status, budget line items other than PBL Kit, timeline, risks, etc.) is still hand-maintained HTML, unchanged by this pipeline.
 
 ## Source
 

@@ -1,0 +1,49 @@
+name: Sync dashboard data from Google Sheet
+
+on:
+  schedule:
+    # Every 15 minutes. GitHub may delay scheduled runs under load, so treat
+    # this as "roughly every 15 min," not a hard guarantee.
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-data
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    # Skips cleanly (not a failure) until GOOGLE_SERVICE_ACCOUNT_JSON is set up —
+    # see README's "Live sync setup" section. Otherwise this would fail loudly
+    # every 15 minutes and spam Actions notifications before setup is done.
+    if: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Fetch sheet and rebuild data/schools.json
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: python3 scripts/fetch_and_build.py
+
+      - name: Commit and push if data changed
+        run: |
+          if git diff --quiet -- data/schools.json; then
+            echo "No changes in data/schools.json — skipping commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/schools.json
+          git commit -m "Auto-sync: refresh data/schools.json from S&ME School tab"
+          git push

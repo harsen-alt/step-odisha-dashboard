@@ -170,6 +170,15 @@
   .budget-card .d { font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; line-height: 1.45; }
   .budget-card .flagrow { display:flex; align-items:center; gap:6px; margin-top:8px; font-size:0.72rem; color: var(--status-critical); text-transform: uppercase; letter-spacing: 0.03em; }
 
+  .live-status {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; color: var(--text-muted);
+    margin: -6px 0 14px;
+  }
+  .live-status .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--status-neutral); flex: none; }
+  .live-status.live .dot { background: var(--status-good); }
+  .live-status.stale .dot { background: var(--status-warning); }
+  .live-status.error .dot { background: var(--status-critical); }
+
   /* district heat grid (relative-intensity view, not a geographic map) */
   .heatgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; }
   .heatgrid .cell { border-radius: 8px; padding: 9px 6px; text-align: center; line-height: 1.3; }
@@ -237,7 +246,7 @@
   <header class="top">
     <h1>STEP Odisha — Program Dashboard <span class="badge">AY2026-27</span></h1>
     <p class="sub">Project-Based Learning (PBL) program · Mantra4Change × Odisha School &amp; Mass Education Dept., OSEPA, SCERT</p>
-    <p class="asof">Source: "STEP Odisha_Program Management Sheet: 2026-27" (Google Sheets) · scoped to Academic Year 2026-27 only, sourced from Active tabs per the sheet's own Index tab (Hidden tabs excluded) · snapshot as of 2026-08-13</p>
+    <p class="asof">Source: "STEP Odisha_Program Management Sheet: 2026-27" (Google Sheets) · scoped to Academic Year 2026-27 only, sourced from Active tabs per the sheet's own Index tab (Hidden tabs excluded) · most sections are a hand-maintained snapshot as of 2026-08-13, except the Schools/HMs/Teachers/PBL Kit figures and the District-level school coverage &amp; School explorer sections below, which auto-refresh from the sheet — see the "Live" indicator</p>
   </header>
 
   <section>
@@ -345,6 +354,7 @@
 
   <section>
     <h2 class="sec-title">District-level school coverage <span class="hint">— Grades 6-8, all 30 districts, state-wide</span></h2>
+    <div class="live-status" id="live-status">Loading live data…</div>
     <div class="card">
       <div class="tiles" style="margin-bottom:18px;">
         <div class="tile"><div class="val" id="dc-total-schools">–</div><div class="lbl">Schools with Gr. 6, 7 or 8</div></div>
@@ -623,7 +633,24 @@
       if (nextBtn) nextBtn.addEventListener("click", function () { state.page++; renderTable(); });
     }
 
-    function init(data) {
+    // Auto-refresh: the GitHub Action behind data/schools.json commits a fresh
+    // copy roughly every 15 min whenever the sheet changes. An open tab polls
+    // for that on its own timer so it updates without a manual reload.
+    var POLL_MS = 3 * 60 * 1000;
+    var pollTimer = null;
+
+    function setLiveStatus(kind, text) {
+      var el = document.getElementById("live-status");
+      if (!el) return;
+      el.className = "live-status " + kind;
+      el.innerHTML = '<span class="dot"></span>' + escapeHtml(text);
+    }
+
+    function timeNow() {
+      return new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    }
+
+    function firstInit(data) {
       state.data = data;
       renderKPIs(data);
       renderTopKPIs(data);
@@ -636,18 +663,63 @@
       document.getElementById("dc-district-filter").addEventListener("change", function () { updateBlockOptions(); applyFilters(); });
       document.getElementById("dc-block-filter").addEventListener("change", applyFilters);
       document.getElementById("dc-grade-filter").addEventListener("change", applyFilters);
+      setLiveStatus("live", "Live — checked " + timeNow() + " (auto-refreshes every 3 min)");
+      startPolling();
     }
 
-    fetch("data/schools.json")
-      .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
-      .then(init)
-      .catch(function (err) {
-        var msg = "Could not load school data (data/schools.json): " + err.message;
-        var note = document.getElementById("dc-source-note");
-        if (note) note.textContent = msg;
-        var body = document.getElementById("dc-table-body");
-        if (body) body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--status-critical);padding:20px;">' + msg + "</td></tr>";
-      });
+    function refreshInit(data) {
+      // Same as firstInit's render steps, but preserves the visitor's current
+      // search/filter/page state and dropdown selections instead of resetting them.
+      var prevDistVal = document.getElementById("dc-district-filter").value;
+      var prevBlockVal = document.getElementById("dc-block-filter").value;
+      var changed = !state.data || JSON.stringify(state.data.meta) !== JSON.stringify(data.meta);
+
+      state.data = data;
+      renderKPIs(data);
+      renderTopKPIs(data);
+      renderDistrictChart(data);
+      renderHeatGrid(data);
+      renderSourceNote(data);
+
+      var distSel = document.getElementById("dc-district-filter");
+      distSel.innerHTML = '<option value="">All districts</option>';
+      populateFilterOptions(data);
+      distSel.value = prevDistVal;
+      updateBlockOptions();
+      document.getElementById("dc-block-filter").value = prevBlockVal;
+
+      applyFilters();
+      setLiveStatus("live", (changed ? "Updated — refreshed " : "Live — checked ") + timeNow() + " (auto-refreshes every 3 min)");
+    }
+
+    function loadData(isFirst) {
+      return fetch("data/schools.json", { cache: "no-cache" })
+        .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+        .then(isFirst ? firstInit : refreshInit)
+        .catch(function (err) {
+          var msg = "Could not load school data (data/schools.json): " + err.message;
+          if (isFirst) {
+            var note = document.getElementById("dc-source-note");
+            if (note) note.textContent = msg;
+            var body = document.getElementById("dc-table-body");
+            if (body) body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--status-critical);padding:20px;">' + msg + "</td></tr>";
+          }
+          setLiveStatus("error", "Auto-refresh failed at " + timeNow() + " — showing last-loaded data");
+        });
+    }
+
+    function startPolling() {
+      if (pollTimer) return;
+      pollTimer = setInterval(function () {
+        if (document.visibilityState === "visible") loadData(false);
+      }, POLL_MS);
+    }
+
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "visible" && state.data) loadData(false);
+    });
+
+    loadData(true);
   })();
   </script>
 
