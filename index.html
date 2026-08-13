@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STEP Odisha — Program Management Dashboard 2026-27</title>
+<title>STEP Odisha — AY2026-27 Program Dashboard</title>
 <style>
   .viz-root {
     color-scheme: light;
@@ -105,6 +105,7 @@
   header.top h1 { font-size: 1.7rem; margin: 0 0 4px; letter-spacing: -0.01em; }
   header.top p.sub { color: var(--text-secondary); margin: 0; font-size: 0.95rem; }
   header.top .asof { color: var(--text-muted); font-size: 0.82rem; margin-top: 6px; }
+  .badge { display: inline-block; background: var(--series-1); color: #fff; font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; margin-left: 8px; vertical-align: middle; letter-spacing: 0.02em; }
 
   section { margin-bottom: 36px; }
   h2.sec-title {
@@ -123,17 +124,17 @@
   }
 
   /* Stat tiles */
-  .tiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
-  @media (max-width: 900px) { .tiles { grid-template-columns: repeat(3, 1fr); } }
-  @media (max-width: 560px) { .tiles { grid-template-columns: repeat(2, 1fr); } }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
   .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
   .tile .val { font-size: 1.5rem; font-weight: 600; line-height: 1.1; }
   .tile .lbl { color: var(--text-secondary); font-size: 0.78rem; margin-top: 4px; }
   .tile .flag { color: var(--status-critical); font-size: 0.72rem; margin-top: 4px; }
 
-  /* two-col grid for chart cards */
+  /* two/three-col grids for chart cards */
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 860px) { .grid3 { grid-template-columns: 1fr; } }
 
   /* Bar chart (css-based, horizontal) */
   .barchart .row { display: grid; grid-template-columns: 140px 1fr 64px; align-items: center; gap: 10px; margin: 9px 0; }
@@ -159,15 +160,15 @@
 
   .note { font-size: 0.8rem; color: var(--text-muted); margin-top: 10px; line-height: 1.5; }
   .note b { color: var(--text-secondary); }
+  .note.callout { background: var(--page-plane); border: 1px dashed var(--border); border-radius: 8px; padding: 10px 12px; }
 
-  /* grouped bars for budget */
-  .budget-group { display: grid; grid-template-columns: 110px 1fr; gap: 12px; align-items: center; margin: 14px 0; }
-  .budget-group .glabel { font-size: 0.85rem; color: var(--text-primary); font-weight: 600; text-align: right; }
-  .budget-bars .brow { display: grid; grid-template-columns: 90px 1fr 100px; gap: 8px; align-items: center; margin: 4px 0; }
-  .budget-bars .brow .yr { font-size: 0.72rem; color: var(--text-muted); }
-  .budget-bars .track { background: var(--gridline); border-radius: 4px; height: 12px; }
-  .budget-bars .fill { height: 12px; border-radius: 4px; }
-  .budget-bars .amt { font-size: 0.75rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  /* budget cards */
+  .budget-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .budget-card .t { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 6px; }
+  .budget-card .v { font-size: 1.55rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .budget-card .v.critical { color: var(--status-critical); }
+  .budget-card .d { font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; line-height: 1.45; }
+  .budget-card .flagrow { display:flex; align-items:center; gap:6px; margin-top:8px; font-size:0.72rem; color: var(--status-critical); text-transform: uppercase; letter-spacing: 0.03em; }
 
   /* risk cards */
   .risks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -191,12 +192,7 @@
   .tl .ev .t { font-size: 0.88rem; font-weight: 600; margin: 2px 0 3px; }
   .tl .ev .x { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; }
 
-  table.tbl { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-  table.tbl th { text-align: left; color: var(--text-muted); font-weight: 500; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; padding: 6px 10px; border-bottom: 1px solid var(--gridline); }
-  table.tbl td { padding: 7px 10px; border-bottom: 1px solid var(--gridline); color: var(--text-secondary); font-variant-numeric: tabular-nums; }
-  table.tbl td.strong { color: var(--text-primary); font-weight: 600; }
-
-  footer.pagefoot { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--gridline); color: var(--text-muted); font-size: 0.78rem; }
+  footer.pagefoot { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--gridline); color: var(--text-muted); font-size: 0.78rem; line-height: 1.6; }
 </style>
 </head>
 <body>
@@ -204,24 +200,26 @@
 <div class="wrap">
 
   <header class="top">
-    <h1>STEP Odisha — Program Management Dashboard</h1>
-    <p class="sub">Project-Based Learning (PBL) program · Mantra4Change × Odisha School &amp; Mass Education Dept., OSEPA, SCERT · AY 2026-27</p>
-    <p class="asof">Source: "STEP Odisha_Program Management Sheet: 2026-27" (Google Sheets, 38 tabs) · Snapshot as of 2026-08-13</p>
+    <h1>STEP Odisha — Program Dashboard <span class="badge">AY2026-27</span></h1>
+    <p class="sub">Project-Based Learning (PBL) program · Mantra4Change × Odisha School &amp; Mass Education Dept., OSEPA, SCERT</p>
+    <p class="asof">Source: "STEP Odisha_Program Management Sheet: 2026-27" (Google Sheets) · scoped to Academic Year 2026-27 only · snapshot as of 2026-08-13</p>
   </header>
 
   <section>
     <div class="tiles">
       <div class="tile"><div class="val">30</div><div class="lbl">Districts</div></div>
       <div class="tile"><div class="val">11</div><div class="lbl">Zones</div></div>
-      <div class="tile"><div class="val">1,184</div><div class="lbl">Schools (confirmed)</div></div>
-      <div class="tile"><div class="val">230</div><div class="lbl">Master Trainers</div></div>
-      <div class="tile"><div class="val">₹91.7L</div><div class="lbl">AY25-26 PBL spend</div></div>
-      <div class="tile"><div class="val">24,000</div><div class="lbl">Schools per "Outcome goal" tab</div><div class="flag">⚠ 20× stale vs 1,184</div></div>
+      <div class="tile"><div class="val">24,000</div><div class="lbl">Schools — AY2026-27 scope</div></div>
+      <div class="tile"><div class="val">24,000</div><div class="lbl">Head Masters (HMs)</div></div>
+      <div class="tile"><div class="val">48,000</div><div class="lbl">Teachers targeted (2/school)</div></div>
+      <div class="tile"><div class="val">~15,00,000</div><div class="lbl">Students reached</div></div>
+      <div class="tile"><div class="val">230</div><div class="lbl">Master Trainers deployed</div></div>
+      <div class="tile"><div class="val">₹18.38 Cr</div><div class="lbl">PBL Kit budget basis</div></div>
     </div>
   </section>
 
   <section>
-    <h2 class="sec-title">Task status <span class="hint">— main tracker vs. content pipeline</span></h2>
+    <h2 class="sec-title">Task status <span class="hint">— main tracker vs. content pipeline, AY2026-27</span></h2>
     <div class="grid2">
 
       <div class="card">
@@ -260,7 +258,7 @@
   </section>
 
   <section>
-    <h2 class="sec-title">Content progress by grade <span class="hint">— % of lesson-plan projects finalised</span></h2>
+    <h2 class="sec-title">Content progress by grade <span class="hint">— % of lesson-plan projects finalised, AY2026-27 cohort</span></h2>
     <div class="card barchart">
       <div class="row">
         <div class="name">Grade 8</div>
@@ -277,12 +275,12 @@
         <div class="track"><div class="fill" style="width:20%;background:var(--seq-300)" title="Grade 6 — ~20% finalised, most SST/Odia projects blank"></div></div>
         <div class="value">~20%</div>
       </div>
-      <div class="note"><b>Risk:</b> Grade 6 SST (Projects 2-8) and Odia Literacy (Projects 3-8) are almost entirely unpopulated while Grades 7-8 are fully finalised and translated — a real risk to on-time Grade 6 rollout.</div>
+      <div class="note"><b>Risk:</b> Grade 6 SST (Projects 2-8) and Odia Literacy (Projects 3-8) are almost entirely unpopulated while Grades 7-8 are fully finalised and translated — a real risk to on-time Grade 6 rollout this academic year.</div>
     </div>
   </section>
 
   <section>
-    <h2 class="sec-title">Timeline <span class="hint">— relative to snapshot date, 2026-08-13</span></h2>
+    <h2 class="sec-title">Timeline <span class="hint">— AY2026-27, relative to snapshot date 2026-08-13</span></h2>
     <div class="card">
       <div class="tl">
         <div class="ev done">
@@ -312,7 +310,7 @@
   </section>
 
   <section>
-    <h2 class="sec-title">Scale — schools by district <span class="hint">top 10 of 30 districts, 1,184 total</span></h2>
+    <h2 class="sec-title">District-level tracking coverage <span class="hint">— top 10 of 30 districts</span></h2>
     <div class="card barchart">
       <div class="row"><div class="name">Mayurbhanj</div><div class="track"><div class="fill" style="width:100%;background:var(--seq-650)" title="144 schools"></div></div><div class="value">144</div></div>
       <div class="row"><div class="name">Kandhamal</div><div class="track"><div class="fill" style="width:72.9%;background:var(--seq-600)" title="105 schools"></div></div><div class="value">105</div></div>
@@ -324,44 +322,33 @@
       <div class="row"><div class="name">Sundargarh</div><div class="track"><div class="fill" style="width:44.4%;background:var(--seq-400)" title="64 schools"></div></div><div class="value">64</div></div>
       <div class="row"><div class="name">Gajapati</div><div class="track"><div class="fill" style="width:33.3%;background:var(--seq-300)" title="48 schools"></div></div><div class="value">48</div></div>
       <div class="row"><div class="name">Kalahandi</div><div class="track"><div class="fill" style="width:29.2%;background:var(--seq-200)" title="42 schools"></div></div><div class="value">42</div></div>
-      <div class="note">Smallest: Jagatsinghpur &amp; Bhadrak (3 schools each), Kendrapara (4), Puri (5). Partner-organization mapping explicitly flags <b>no partner currently available for the Sambalpur zone</b>, and calls out Sundargarh, Sambalpur and Mayurbhanj as large districts needing added partner capacity.</div>
+      <div class="note">Smallest: Jagatsinghpur &amp; Bhadrak (3 schools each), Kendrapara (4), Puri (5).</div>
+      <div class="note callout">These district-wise counts are the only granular breakdown in the source sheet, and they sum to <b>1,184 schools</b> — the subset individually tracked (with UDISE codes, HM contacts, etc.) across these 30 districts. A district-by-district split for the remaining schools within the <b>24,000</b> AY2026-27 scope is not available in the source. Partner-organization mapping also explicitly flags <b>no partner currently available for the Sambalpur zone</b>, and calls out Sundargarh, Sambalpur and Mayurbhanj as large districts needing added partner capacity.</div>
     </div>
   </section>
 
   <section>
-    <h2 class="sec-title">Budget <span class="hint">actuals from "Program Summary-EdI" tab — year over year</span></h2>
-    <div class="card">
-      <div class="budget-group">
-        <div class="glabel">PBL</div>
-        <div class="budget-bars">
-          <div class="brow"><div class="yr">AY24-25</div><div class="track"><div class="fill" style="width:5.9%;background:var(--series-1)" title="₹5,36,160 · 80 schools"></div></div><div class="amt">₹5.4L · 80 sch.</div></div>
-          <div class="brow"><div class="yr">AY25-26</div><div class="track"><div class="fill" style="width:100%;background:var(--series-2)" title="₹91,66,624 · 1,184 schools"></div></div><div class="amt">₹91.7L · 1,184 sch.</div></div>
-        </div>
+    <h2 class="sec-title">Budget <span class="hint">— AY2026-27 planning figures</span></h2>
+    <div class="grid3">
+      <div class="budget-card">
+        <div class="t">PBL Kits</div>
+        <div class="v">₹18.38 Cr</div>
+        <div class="d">₹7,660/school × 24,000 schools (AY2026-27 scope). Cardboard boxes, chart paper &amp; stationery for hands-on PBL activities — to be arranged by each school from available budget heads.</div>
       </div>
-      <div class="budget-group">
-        <div class="glabel">BaLA</div>
-        <div class="budget-bars">
-          <div class="brow"><div class="yr">AY24-25</div><div class="track"><div class="fill" style="width:46.2%;background:var(--series-1)" title="₹42,40,000 · 106 schools"></div></div><div class="amt">₹42.4L · 106 sch.</div></div>
-          <div class="brow"><div class="yr">AY25-26</div><div class="track"><div class="fill" style="width:74.2%;background:var(--series-2)" title="₹68,00,000 · 170 schools"></div></div><div class="amt">₹68.0L · 170 sch.</div></div>
-        </div>
+      <div class="budget-card">
+        <div class="t">MT Residential Training</div>
+        <div class="v">₹9,92,700</div>
+        <div class="d">400 participants · 2-day residential state-level training. Food/travel/logistics largely borne by the Department; training kits &amp; resource persons by Mantra4Change.</div>
       </div>
-      <div class="budget-group">
-        <div class="glabel">Sports</div>
-        <div class="budget-bars">
-          <div class="brow"><div class="yr">AY25-26</div><div class="track"><div class="fill" style="width:6.5%;background:var(--series-3)" title="₹6,00,000 · 100 schools · new pilot"></div></div><div class="amt">₹6.0L · 100 sch.</div></div>
-          <div class="brow"><div class="yr" style="visibility:hidden">.</div><div class="note" style="margin:0;">new pilot, 20 districts — no prior-year baseline</div></div>
-        </div>
+      <div class="budget-card">
+        <div class="t">Teacher Training (Cascading)</div>
+        <div class="v critical">₹0</div>
+        <div class="d">District/block-level cascade training for teachers — line item exists but has no allocated budget yet.</div>
+        <div class="flagrow">✕ Not yet budgeted</div>
       </div>
-      <div class="legend">
-        <div class="item"><span class="swatch" style="background:var(--series-1)"></span>AY2024-25</div>
-        <div class="item"><span class="swatch" style="background:var(--series-2)"></span>AY2025-26</div>
-        <div class="item"><span class="swatch" style="background:var(--series-3)"></span>New in AY2025-26</div>
-      </div>
-      <div class="note">
-        <b>Cross-check:</b> PBL Kit unit cost (₹7,660/school) × 1,184 schools ≈ ₹90.65L — nearly identical to the actual ₹91.7L reported, confirming 1,184 schools is the real budget scale.
-        The PBL Kit tab's own headline total of <b>₹18.38 crore</b> uses the stale 24,000-school figure and is ~20× overstated.<br>
-        MT Training budget: <b>₹9,92,700</b> (400 participants, 2-day residential). Teacher Training (Cascading Mode): <b>₹0 — not yet budgeted.</b>
-      </div>
+    </div>
+    <div class="note callout" style="margin-top:14px;">
+      <b>Basis note:</b> the ₹18.38 Cr PBL Kit figure scales the source sheet's per-kit unit cost to the 24,000-school figure from its "Outcome goal" tab. Other tabs in the same workbook — district-wise tallies, the Zone/MT allocation table, and last year's reported actual spend (₹91.66L against 1,184 schools) — tie to that smaller, individually-tracked count instead. Flagged here for transparency since it changes the budget math by roughly 20×; worth reconciling with the program team before this figure is used externally.
     </div>
   </section>
 
@@ -370,7 +357,7 @@
     <div class="card barchart">
       <div class="row"><div class="name">Subhankar</div><div class="track"><div class="fill" style="width:100%;background:var(--seq-600)" title="30 tasks owned"></div></div><div class="value">30</div></div>
       <div class="row"><div class="name">Ananya</div><div class="track"><div class="fill" style="width:53.3%;background:var(--seq-450)" title="16 tasks owned"></div></div><div class="value">16</div></div>
-      <div class="row"><div class="name">Aarfin</div><div class="track"><div class="fill" style="width:36.7%;background:var(--seq-350, var(--seq-400))" title="11 tasks owned"></div></div><div class="value">11</div></div>
+      <div class="row"><div class="name">Aarfin</div><div class="track"><div class="fill" style="width:36.7%;background:var(--seq-400)" title="11 tasks owned"></div></div><div class="value">11</div></div>
       <div class="row"><div class="name">Harsen</div><div class="track"><div class="fill" style="width:23.3%;background:var(--seq-300)" title="7 tasks owned"></div></div><div class="value">7</div></div>
       <div class="row"><div class="name">Soumya</div><div class="track"><div class="fill" style="width:23.3%;background:var(--seq-300)" title="7 tasks owned"></div></div><div class="value">7</div></div>
       <div class="note">Sushree appears in ~48 rows but almost entirely as a <i>reviewer</i> sign-off, not a task owner, so is tracked separately from the owner counts above. <b>Bus-factor risk:</b> Subhankar owns the largest single share of tracked tasks — strategy, all lesson plans across 6 subject/grade combinations, the Ed Plan timeline, and cascading execution.</div>
@@ -378,19 +365,19 @@
   </section>
 
   <section>
-    <h2 class="sec-title">Risks &amp; gaps</h2>
+    <h2 class="sec-title">Risks &amp; gaps <span class="hint">— AY2026-27</span></h2>
     <div class="risks">
       <div class="risk"><div class="ic critical">✕</div><div class="body"><div class="t">District/block orientation stalled</div><div class="d">No Session Plan, PPT, or Logistics owner logged for District or Block Official orientation, while state-level (MSTF, PBL Unit) orientation is fully complete.</div><div class="lvl">Critical</div></div></div>
       <div class="risk"><div class="ic critical">✕</div><div class="body"><div class="t">Grade 6 content lag</div><div class="d">Grade 6 SST and Odia Literacy projects are almost entirely unpopulated versus fully finalised Grades 7-8.</div><div class="lvl">Critical</div></div></div>
+      <div class="risk"><div class="ic critical">✕</div><div class="body"><div class="t">Teacher Training (Cascading) unbudgeted</div><div class="d">The district/block-level teacher cascade-training line item still shows ₹0 — no funds allocated for AY2026-27 as of this snapshot.</div><div class="lvl">Critical</div></div></div>
       <div class="risk"><div class="ic warning">▲</div><div class="body"><div class="t">Govt. Engagement Tracker empty</div><div class="d">Headers exist (Department, Officer, Relationship Status, Last Interaction) but zero rows of real data, despite government relationship-building being a stated priority.</div><div class="lvl">Warning</div></div></div>
       <div class="risk"><div class="ic warning">▲</div><div class="body"><div class="t">No partner org for Sambalpur zone</div><div class="d">Explicit sheet comment: no partner currently mapped for Sambalpur; Sundargarh and Mayurbhanj also flagged as large districts needing more partner capacity.</div><div class="lvl">Warning</div></div></div>
       <div class="risk"><div class="ic warning">▲</div><div class="body"><div class="t">Weekly MoM cadence stopped</div><div class="d">Only 2 weeks of meeting minutes logged (early-mid June); no visible record since, right as implementation begins.</div><div class="lvl">Warning</div></div></div>
-      <div class="risk"><div class="ic warning">▲</div><div class="body"><div class="t">Stale scale figure drives budget error</div><div class="d">"Outcome goal" tab's 24,000-school figure (vs. confirmed 1,184) inflates the PBL Kit tab's projected total to ₹18.38 crore, ~20× the real budget scale.</div><div class="lvl">Warning</div></div></div>
     </div>
   </section>
 
   <footer class="pagefoot">
-    Generated from "STEP Odisha_Program Management Sheet: 2026-27" (Google Sheets). Figures are approximate roll-ups from a 38-tab workbook and should be cross-checked against the live sheet before external use. This repo is public — it contains internal staff and budget data.
+    Generated from "STEP Odisha_Program Management Sheet: 2026-27" (Google Sheets), scoped to Academic Year 2026-27 only. The 24,000-school figure follows the source sheet's "Outcome goal" tab per program-team direction; see the Budget section note above for how this differs from other tabs in the same workbook. Figures are approximate roll-ups and should be cross-checked against the live sheet before external use. This repo is public — it contains internal staff and budget data.
   </footer>
 
 </div>
