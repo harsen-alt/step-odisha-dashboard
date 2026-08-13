@@ -15,12 +15,28 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  sync:
+  check-secret:
     runs-on: ubuntu-latest
+    outputs:
+      has_secret: ${{ steps.check.outputs.has_secret }}
+    steps:
+      - id: check
+        run: |
+          if [ -n "$SECRET_VALUE" ]; then
+            echo "has_secret=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_secret=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          SECRET_VALUE: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+
+  sync:
+    needs: check-secret
     # Skips cleanly (not a failure) until GOOGLE_SERVICE_ACCOUNT_JSON is set up —
     # see README's "Live sync setup" section. Otherwise this would fail loudly
     # every 15 minutes and spam Actions notifications before setup is done.
-    if: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON != '' }}
+    if: needs.check-secret.outputs.has_secret == 'true'
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
