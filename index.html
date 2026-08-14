@@ -4,73 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>STEP Odisha — Program Dashboard</title>
+<link rel="stylesheet" href="assets/theme.css">
 <style>
-  .viz-root {
-    color-scheme: light;
-    --surface-1:      #ffffff;
-    --page-plane:      #f4f6f9;
-    --text-primary:   #101828;
-    --text-secondary: #4b5768;
-    --text-muted:     #8792a0;
-    --gridline:       #e4e8ee;
-    --border:         rgba(16,24,40,0.10);
-
-    --primary:      #123b5e;
-    --primary-tint: #2e6da4;
-    --primary-soft: #e8eef4;
-    --accent:       #b5790e;
-
-    --seq-200: #9fc2e3;
-    --seq-300: #79aad6;
-    --seq-400: #4e8ac2;
-    --seq-450: #2e6da4;
-    --seq-500: #1f4e7a;
-    --seq-600: #123b5e;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:where(:not([data-theme="light"])) .viz-root {
-      color-scheme: dark;
-      --surface-1:      #161b22;
-      --page-plane:      #0d1117;
-      --text-primary:   #f0f3f7;
-      --text-secondary: #b6c0cc;
-      --text-muted:     #7c8798;
-      --gridline:       #2a323d;
-      --border:         rgba(255,255,255,0.12);
-
-      --primary:      #6ea6da;
-      --primary-tint: #9fc2e3;
-      --primary-soft: #1b2836;
-      --accent:       #e0ac4c;
-    }
-  }
-  :root[data-theme="dark"] .viz-root {
-    color-scheme: dark;
-    --surface-1:      #161b22;
-    --page-plane:      #0d1117;
-    --text-primary:   #f0f3f7;
-    --text-secondary: #b6c0cc;
-    --text-muted:     #7c8798;
-    --gridline:       #2a323d;
-    --border:         rgba(255,255,255,0.12);
-
-    --primary:      #6ea6da;
-    --primary-tint: #9fc2e3;
-    --primary-soft: #1b2836;
-    --accent:       #e0ac4c;
-  }
-
-  * { box-sizing: border-box; }
-  html, body {
-    margin: 0; padding: 0;
-    background: var(--page-plane);
-    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
-    color: var(--text-primary);
-    -webkit-font-smoothing: antialiased;
-  }
-  .viz-root { background: var(--page-plane); min-height: 100vh; }
-  :root { --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 64px; }
-
   /* ---------- Hero ---------- */
   .hero {
     position: relative;
