@@ -3,7 +3,7 @@ Shared transform: raw "S&ME School" tab records -> data/schools.json.
 
 Used by both:
   - build_data.py        (manual path: reads a local CSV export)
-  - fetch_and_build.py    (automated path: reads rows via the Sheets API)
+  - fetch_and_build.py    (automated path: downloads the tab's CSV export directly)
 
 Filter rule: a school is included if its class range (Class From..Class To)
 overlaps Grade 6-8, i.e. Class From <= 8 and Class To >= 6. Schools offering
@@ -43,18 +43,6 @@ def to_int(value, default=0):
         return int(str(value).strip())
     except (TypeError, ValueError):
         return default
-
-
-def rows_to_records(header, data_rows):
-    """Convert a header row + 2D list of row values (as returned by the Sheets
-    API) into a list of dicts keyed by header name, matching csv.DictReader's
-    shape. Short/ragged rows (Sheets API omits trailing empty cells) are
-    padded with ''."""
-    records = []
-    for row in data_rows:
-        padded = row + [""] * (len(header) - len(row))
-        records.append(dict(zip(header, padded)))
-    return records
 
 
 def build_from_records(records, snapshot_date):
