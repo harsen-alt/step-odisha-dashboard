@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STEP Odisha — AY2026-27 Program Dashboard</title>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1:      #ffffff;
+    --page-plane:      #f4f6f9;
+    --text-primary:   #101828;
+    --text-secondary: #4b5768;
+    --text-muted:     #8792a0;
+    --gridline:       #e4e8ee;
+    --baseline:       #ccd2db;
+    --border:         rgba(16,24,40,0.10);
+    --success-text:   #146029;
+
+    /* Brand — Navy (primary) & Amber (accent). Kept to two decorative
+       hues; status colors below are a separate, reserved semantic set. */
+    --primary:      #123b5e;
+    --primary-tint: #2e6da4;
+    --primary-soft: #e8eef4;
+    --accent:       #b5790e;
+
+    --status-good:     #1a7a34;
+    --status-warning:  #8a6d00;
+    --status-serious:  #c1502e;
+    --status-critical: #b3261e;
+    --status-neutral:  #ccd2db;
+
+    /* Sequential ramp — single hue (navy), for magnitude only (district
+       intensity grid, bar-chart fills). 6 steps, not 8: closer steps
+       read as noise rather than signal at this ramp's length. */
+    --seq-200: #9fc2e3;
+    --seq-300: #79aad6;
+    --seq-400: #4e8ac2;
+    --seq-450: #2e6da4;
+    --seq-500: #1f4e7a;
+    --seq-600: #123b5e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:      #161b22;
+      --page-plane:      #0d1117;
+      --text-primary:   #f0f3f7;
+      --text-secondary: #b6c0cc;
+      --text-muted:     #7c8798;
+      --gridline:       #2a323d;
+      --baseline:       #3a4453;
+      --border:         rgba(255,255,255,0.12);
+      --success-text:   #4ade80;
+
+      --primary:      #6ea6da;
+      --primary-tint: #9fc2e3;
+      --primary-soft: #1b2836;
+      --accent:       #e0ac4c;
+
+      --status-good:     #4ade80;
+      --status-warning:  #eab308;
+      --status-serious:  #f0876a;
+      --status-critical: #f26363;
+      --status-neutral:  #3a4453;
+
+      --seq-200: #123b5e;
+      --seq-300: #1f4e7a;
+      --seq-400: #2e6da4;
+      --seq-450: #4e8ac2;
+      --seq-500: #79aad6;
+      --seq-600: #9fc2e3;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:      #161b22;
+    --page-plane:      #0d1117;
+    --text-primary:   #f0f3f7;
+    --text-secondary: #b6c0cc;
+    --text-muted:     #7c8798;
+    --gridline:       #2a323d;
+    --baseline:       #3a4453;
+    --border:         rgba(255,255,255,0.12);
+    --success-text:   #4ade80;
+
+    --primary:      #6ea6da;
+    --primary-tint: #9fc2e3;
+    --primary-soft: #1b2836;
+    --accent:       #e0ac4c;
+
+    --status-good:     #4ade80;
+    --status-warning:  #eab308;
+    --status-serious:  #f0876a;
+    --status-critical: #f26363;
+    --status-neutral:  #3a4453;
+
+    --seq-200: #123b5e;
+    --seq-300: #1f4e7a;
+    --seq-400: #2e6da4;
+    --seq-450: #4e8ac2;
+    --seq-500: #79aad6;
+    --seq-600: #9fc2e3;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--page-plane);
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+  .viz-root { background: var(--page-plane); min-height: 100vh; }
+
+  /* Layout rhythm — one spacing scale, reused everywhere instead of ad hoc px. */
+  :root { --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 64px; }
+
+  .wrap { max-width: 1240px; margin: 0 auto; padding: var(--sp-6) var(--sp-4) var(--sp-8); }
+  @media (min-width: 768px)  { .wrap { padding: var(--sp-7) var(--sp-5) var(--sp-8); } }
+  @media (min-width: 1280px) { .wrap { padding: var(--sp-7) var(--sp-6) var(--sp-8); } }
+
+  header.top { margin-bottom: var(--sp-6); padding-bottom: var(--sp-5); border-bottom: 1px solid var(--gridline); }
+  .home-link {
+    display: inline-block; font-size: 0.8rem; font-weight: 600; color: var(--primary-tint);
+    text-decoration: none; margin-bottom: var(--sp-3);
+  }
+  .home-link:hover { text-decoration: underline; }
+  header.top h1 {
+    font-size: clamp(1.4rem, 1.1rem + 1.2vw, 1.9rem);
+    font-weight: 700; margin: 0 0 var(--sp-2); letter-spacing: -0.015em; color: var(--primary);
+  }
+  header.top p.sub { color: var(--text-secondary); margin: 0; font-size: 0.98rem; line-height: 1.5; max-width: 72ch; }
+  header.top .asof { color: var(--text-muted); font-size: 0.82rem; margin-top: var(--sp-3); line-height: 1.6; max-width: 82ch; }
+  .badge {
+    display: inline-block; background: var(--accent); color: #fff; font-size: 0.7rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 999px; margin-left: var(--sp-2); vertical-align: middle; letter-spacing: 0.03em;
+  }
+
+  section { margin-bottom: var(--sp-7); }
+  @media (min-width: 768px) { section { margin-bottom: var(--sp-8); } }
+  h2.sec-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 var(--sp-4);
+    padding-left: var(--sp-3);
+    border-left: 3px solid var(--accent);
+    color: var(--primary);
+    display: flex; align-items: baseline; gap: var(--sp-2); flex-wrap: wrap;
+  }
+  h2.sec-title .hint { font-size: 0.8rem; color: var(--text-muted); font-weight: 400; }
+
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--sp-5);
+    box-shadow: 0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.05);
+  }
+  @media (min-width: 768px) { .card { padding: var(--sp-6); } }
+
+  /* Stat tiles (KPI cards) */
+  .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-3); }
+  @media (min-width: 560px)  { .tiles { grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); } }
+  @media (min-width: 1024px) { .tiles { grid-template-columns: repeat(4, 1fr); } }
+  .tile {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+    padding: var(--sp-4) var(--sp-4); position: relative; overflow: hidden;
+    box-shadow: 0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.05);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .tile::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.25s ease;
+  }
+  .tile:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(16,24,40,0.08), 0 1px 3px rgba(16,24,40,0.06); }
+  .tile:hover::before { transform: scaleX(1); }
+  /* Scaled per breakpoint, not fluid vw: long Indian-format figures (e.g.
+     "28,11,476") have no break opportunity, so a size that doesn't fit the
+     column width at a given breakpoint overflows the card rather than wrapping. */
+  .tile .val { font-size: 1.15rem; font-weight: 700; line-height: 1.15; color: var(--primary); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+  @media (min-width: 480px)  { .tile .val { font-size: 1.35rem; } }
+  @media (min-width: 768px)  { .tile .val { font-size: 1.55rem; } }
+  @media (min-width: 1024px) { .tile .val { font-size: 1.7rem; } }
+  .tile .lbl { color: var(--text-secondary); font-size: 0.8rem; margin-top: var(--sp-2); line-height: 1.35; }
+  .tile .flag { color: var(--status-critical); font-size: 0.72rem; margin-top: var(--sp-1); font-weight: 600; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tile { opacity: 0; animation: tileIn 0.5s ease forwards; }
+    .tile:nth-child(1) { animation-delay: 0ms; }
+    .tile:nth-child(2) { animation-delay: 55ms; }
+    .tile:nth-child(3) { animation-delay: 110ms; }
+    .tile:nth-child(4) { animation-delay: 165ms; }
+    .tile:nth-child(5) { animation-delay: 220ms; }
+    .tile:nth-child(6) { animation-delay: 275ms; }
+    .tile:nth-child(7) { animation-delay: 330ms; }
+    .tile:nth-child(8) { animation-delay: 385ms; }
+  }
+  @keyframes tileIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* two/three-col grids for chart cards */
+  .grid2 { display: grid; grid-template-columns: 1fr; gap: var(--sp-4); }
+  @media (min-width: 768px) { .grid2 { grid-template-columns: 1fr 1fr; gap: var(--sp-5); } }
+  .grid3 { display: grid; grid-template-columns: 1fr; gap: var(--sp-4); }
+  @media (min-width: 768px)  { .grid3 { grid-template-columns: repeat(2, 1fr); gap: var(--sp-5); } }
+  @media (min-width: 1280px) { .grid3 { grid-template-columns: repeat(3, 1fr); } }
+
+  /* Bar chart (css-based, horizontal) */
+  .barchart .row { display: grid; grid-template-columns: 96px 1fr 56px; align-items: center; gap: var(--sp-2); margin: var(--sp-2) 0; }
+  @media (min-width: 480px) { .barchart .row { grid-template-columns: 140px 1fr 64px; gap: var(--sp-3); } }
+  .barchart .row .name { font-size: 0.8rem; color: var(--text-secondary); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .barchart .row .track { background: var(--gridline); border-radius: 4px; height: 14px; position: relative; }
+  .barchart .row .fill { height: 14px; border-radius: 4px; position: relative; transition: filter 0.15s ease, transform 0.15s ease; }
+  .barchart .row .fill:hover { filter: brightness(1.1); }
+  .barchart .row .value { font-size: 0.8rem; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .barchart .row .fill[title] { cursor: default; }
+
+  /* legend */
+  .legend { display: flex; flex-wrap: wrap; gap: var(--sp-4); margin-top: var(--sp-4); font-size: 0.8rem; color: var(--text-secondary); }
+  .legend .item { display: flex; align-items: center; gap: var(--sp-2); }
+  .legend .swatch { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+  .legend .icon { font-size: 0.85rem; }
+
+  /* donut via conic-gradient, with a hover tooltip driven by scripts/donut segment data */
+  .donut-wrap { display: flex; align-items: center; gap: var(--sp-6); flex-wrap: wrap; }
+  .donut { width: 150px; height: 150px; border-radius: 50%; flex: none; position: relative; cursor: pointer; transition: transform 0.2s ease, filter 0.2s ease; }
+  .donut:hover { transform: scale(1.035); filter: brightness(1.04); }
+  .donut .hole {
+    position: absolute; inset: 22px; border-radius: 50%; background: var(--surface-1);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+  .donut .hole .n { font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--primary); }
+  .donut .hole .t { font-size: 0.65rem; color: var(--text-muted); text-align: center; }
+  .donut-tip {
+    position: fixed; pointer-events: none; z-index: 50; background: var(--primary); color: #fff;
+    font-size: 0.76rem; line-height: 1.4; padding: 6px 10px; border-radius: 8px; max-width: 240px;
+    box-shadow: 0 4px 14px rgba(16,24,40,0.22); opacity: 0; transform: translateY(2px);
+    transition: opacity 0.12s ease, transform 0.12s ease;
+  }
+  .donut-tip.show { opacity: 1; transform: translateY(0); }
+  .donut-tip b { font-variant-numeric: tabular-nums; }
+
+  .note { font-size: 0.8rem; color: var(--text-muted); margin-top: var(--sp-3); line-height: 1.55; }
+  .note b { color: var(--text-secondary); }
+  .note.callout { background: var(--page-plane); border: 1px dashed var(--border); border-radius: 8px; padding: var(--sp-3) var(--sp-4); }
+
+  /* budget cards */
+  .budget-card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: var(--sp-4);
+    box-shadow: 0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.05);
+  }
+  .budget-card .t { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: var(--sp-2); font-weight: 600; }
+  .budget-card .v { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--primary); }
+  .budget-card .v.critical { color: var(--status-critical); }
+  .budget-card .d { font-size: 0.78rem; color: var(--text-muted); margin-top: var(--sp-2); line-height: 1.5; }
+  .budget-card .flagrow { display:flex; align-items:center; gap: var(--sp-2); margin-top: var(--sp-3); font-size: 0.72rem; color: var(--status-critical); font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+
+  .live-status {
+    display: inline-flex; align-items: center; gap: var(--sp-2); font-size: 0.76rem; color: var(--text-muted);
+    margin: 0 0 var(--sp-4);
+  }
+  .live-status .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--status-neutral); flex: none; }
+  .live-status.live .dot { background: var(--status-good); }
+  .live-status.stale .dot { background: var(--status-warning); }
+  .live-status.error .dot { background: var(--status-critical); }
+
+  /* district heat grid (relative-intensity view, not a geographic map) */
+  .heatgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: var(--sp-2); }
+  .heatgrid .cell { border-radius: 8px; padding: var(--sp-3) var(--sp-2); text-align: center; line-height: 1.3; transition: transform 0.15s ease; }
+  .heatgrid .cell:hover { transform: translateY(-1px) scale(1.03); }
+  .heatgrid .cell .n { font-weight: 700; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+  .heatgrid .cell .t { font-size: 0.62rem; opacity: 0.92; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* school explorer: filters, table, pager */
+  .filters-row { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-bottom: var(--sp-4); align-items: center; }
+  .filters-row input[type="search"], .filters-row select {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 11px; font-size: 0.82rem; color: var(--text-primary); font-family: inherit;
+  }
+  .filters-row input[type="search"]:focus, .filters-row select:focus {
+    outline: none; border-color: var(--primary-tint); box-shadow: 0 0 0 3px var(--primary-soft);
+  }
+  .filters-row input[type="search"] { flex: 1 1 220px; min-width: 160px; }
+  .filters-count { font-size: 0.78rem; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+  table.dc-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 640px; }
+  table.dc-table th {
+    text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border);
+    color: var(--primary); font-weight: 700; white-space: nowrap; position: sticky; top: 0; background: var(--surface-1);
+  }
+  table.dc-table td {
+    padding: 8px 14px; border-bottom: 1px solid var(--gridline);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px;
+  }
+  table.dc-table tbody tr:hover { background: var(--primary-soft); }
+
+  .pager { display: flex; align-items: center; gap: var(--sp-3); margin-top: var(--sp-4); font-size: 0.8rem; color: var(--text-secondary); }
+  .pager button {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    padding: 6px 12px; cursor: pointer; color: var(--primary); font-weight: 600; font-size: 0.8rem; font-family: inherit;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .pager button:disabled { opacity: 0.4; cursor: default; }
+  .pager button:hover:not(:disabled) { background: var(--primary-soft); border-color: var(--primary-tint); }
+
+  /* risk cards */
+  .risks { display: grid; grid-template-columns: 1fr; gap: var(--sp-3); }
+  @media (min-width: 768px) { .risks { grid-template-columns: repeat(2, 1fr); gap: var(--sp-4); } }
+  .risk {
+    background: var(--surface-1); border: 1px solid var(--border); border-left: 3px solid var(--status-neutral);
+    border-radius: 10px; padding: var(--sp-4); display: flex; gap: var(--sp-3);
+    box-shadow: 0 1px 2px rgba(16,24,40,0.04);
+  }
+  .risk:has(.ic.critical) { border-left-color: var(--status-critical); }
+  .risk:has(.ic.warning)  { border-left-color: var(--status-warning); }
+  .risk .ic { flex: none; font-size: 1.05rem; line-height: 1.4; }
+  .risk .ic.critical { color: var(--status-critical); }
+  .risk .ic.warning { color: var(--status-warning); }
+  .risk .body .t { font-size: 0.86rem; font-weight: 700; margin-bottom: var(--sp-1); color: var(--text-primary); }
+  .risk .body .d { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; }
+  .risk .body .lvl { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-top: var(--sp-2); font-weight: 600; }
+
+  /* timeline */
+  .tl { border-left: 2px solid var(--baseline); margin-left: var(--sp-2); padding-left: var(--sp-5); }
+  .tl .ev { position: relative; margin-bottom: var(--sp-5); }
+  .tl .ev::before { content: ""; position: absolute; left: -29px; top: 3px; width: 9px; height: 9px; border-radius: 50%; background: var(--primary); border: 2px solid var(--surface-1); }
+  .tl .ev.due::before { background: var(--status-critical); }
+  .tl .ev.done::before { background: var(--status-good); }
+  .tl .ev.gap::before { background: var(--status-warning); }
+  .tl .ev .d { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; font-weight: 600; }
+  .tl .ev .t { font-size: 0.88rem; font-weight: 700; margin: var(--sp-1) 0 3px; }
+  .tl .ev .x { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.55; }
+
+  footer.pagefoot { margin-top: var(--sp-7); padding-top: var(--sp-4); border-top: 1px solid var(--gridline); color: var(--text-muted); font-size: 0.78rem; line-height: 1.65; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+<div class="wrap">
+
+  <header class="top">
+    <a class="home-link" href="index.html">&larr; STEP Odisha home</a>
+    <h1>STEP Odisha — Program Dashboard <span class="badge">AY2026-27</span></h1>
+    <p class="sub">Project-Based Learning (PBL) program · Mantra4Change × Odisha School &amp; Mass Education Dept., OSEPA, SCERT</p>
+    <p class="asof">Source: "STEP Odisha_Program Management Sheet: 2026-27" (Google Sheets) · scoped to Academic Year 2026-27 only, sourced from Active tabs per the sheet's own Index tab (Hidden tabs excluded) · most sections are a hand-maintained snapshot as of 2026-08-13, except the Schools/HMs/Teachers/PBL Kit figures and the District-level school coverage &amp; School explorer sections below, which auto-refresh from the sheet — see the "Live" indicator</p>
+  </header>
+
+  <section>
+    <div class="tiles">
+      <div class="tile"><div class="val">30</div><div class="lbl">Districts</div></div>
+      <div class="tile"><div class="val">11</div><div class="lbl">Zones</div></div>
+      <div class="tile"><div class="val" id="top-schools">17,633</div><div class="lbl">Schools — AY2026-27 scope</div></div>
+      <div class="tile"><div class="val" id="top-hms">17,633</div><div class="lbl">Head Masters (HMs)</div></div>
+      <div class="tile"><div class="val" id="top-teachers">35,266</div><div class="lbl">Teachers targeted (2/school)</div></div>
+      <div class="tile"><div class="val">~15,00,000</div><div class="lbl">Students reached</div></div>
+      <div class="tile"><div class="val">230</div><div class="lbl">Master Trainers deployed</div></div>
+      <div class="tile"><div class="val" id="top-pblkit">₹13.51 Cr</div><div class="lbl">PBL Kit budget basis</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">Task status <span class="hint">— main tracker vs. content pipeline, AY2026-27</span></h2>
+    <div class="grid2">
+
+      <div class="card">
+        <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:10px;">Program Index — activity tracker (43 tracked task rows)</div>
+        <div class="donut-wrap">
+          <div class="donut" tabindex="0" style="background: conic-gradient(var(--status-good) 0% 48.8%, var(--status-warning) 48.8% 51.1%, var(--status-neutral) 51.1% 100%);"
+            data-segments='[{"from":0,"to":48.8,"color":"var(--status-good)","label":"1st Draft Completed / Finalised","value":"21 rows (49%)"},{"from":48.8,"to":51.1,"color":"var(--status-warning)","label":"Ongoing","value":"1 row (2%)"},{"from":51.1,"to":100,"color":"var(--status-neutral)","label":"No status logged","value":"21 rows (49%)"}]'>
+            <div class="hole"><div class="n">49%</div><div class="t">done or drafted</div></div>
+          </div>
+          <div class="legend" style="flex-direction:column;align-items:flex-start;">
+            <div class="item"><span class="icon">✓</span><span class="swatch" style="background:var(--status-good)"></span>1st Draft Completed / Finalised — 21 rows (49%)</div>
+            <div class="item"><span class="icon">◐</span><span class="swatch" style="background:var(--status-warning)"></span>Ongoing — 1 row (2%)</div>
+            <div class="item"><span class="icon">•</span><span class="swatch" style="background:var(--status-neutral)"></span>No status logged — 21 rows (49%)</div>
+          </div>
+        </div>
+        <div class="note">Half of tracked rows have no status update yet — mostly Logistics sub-tasks for district/block-level orientation.</div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:10px;">Lesson-plan content pipeline (84 rows: Math + Science + Odia Literacy + SST, Gr. 6-8)</div>
+        <div class="donut-wrap">
+          <div class="donut" tabindex="0" style="background: conic-gradient(var(--status-good) 0% 82.1%, var(--status-warning) 82.1% 88.1%, var(--status-serious) 88.1% 95.2%, var(--status-critical) 95.2% 100%);"
+            data-segments='[{"from":0,"to":82.1,"color":"var(--status-good)","label":"Finalised","value":"69 projects (82%)"},{"from":82.1,"to":88.1,"color":"var(--status-warning)","label":"In review (+ incorp.)","value":"5 (6%)"},{"from":88.1,"to":95.2,"color":"var(--status-serious)","label":"In creation","value":"6 (7%)"},{"from":95.2,"to":100,"color":"var(--status-critical)","label":"Not started","value":"4 (5%)"}]'>
+            <div class="hole"><div class="n">82%</div><div class="t">finalised</div></div>
+          </div>
+          <div class="legend" style="flex-direction:column;align-items:flex-start;">
+            <div class="item"><span class="icon">✓</span><span class="swatch" style="background:var(--status-good)"></span>Finalised — 69 projects (82%)</div>
+            <div class="item"><span class="icon">◐</span><span class="swatch" style="background:var(--status-warning)"></span>In review (+ incorp.) — 5 (6%)</div>
+            <div class="item"><span class="icon">▲</span><span class="swatch" style="background:var(--status-serious)"></span>In creation — 6 (7%)</div>
+            <div class="item"><span class="icon">✕</span><span class="swatch" style="background:var(--status-critical)"></span>Not started — 4 (5%)</div>
+          </div>
+        </div>
+        <div class="note">All 24 Odia Literacy and all 24 SST projects (Grades 6-8) are Finalised; the remaining work is entirely in Math &amp; Science chapters — see Content Progress below.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">Content progress by grade <span class="hint">— % of lesson-plan projects finalised, AY2026-27 cohort</span></h2>
+    <div class="card barchart">
+      <div class="row">
+        <div class="name">Grade 8</div>
+        <div class="track"><div class="fill" style="width:82.1%;background:var(--seq-450)" title="Grade 8 — 23 of 28 projects finalised (82.1%)"></div></div>
+        <div class="value">82.1%</div>
+      </div>
+      <div class="row">
+        <div class="name">Grade 7</div>
+        <div class="track"><div class="fill" style="width:82.1%;background:var(--seq-450)" title="Grade 7 — 23 of 28 projects finalised (82.1%)"></div></div>
+        <div class="value">82.1%</div>
+      </div>
+      <div class="row">
+        <div class="name">Grade 6</div>
+        <div class="track"><div class="fill" style="width:82.1%;background:var(--seq-450)" title="Grade 6 — 23 of 28 projects finalised (82.1%)"></div></div>
+        <div class="value">82.1%</div>
+      </div>
+      <div class="note">Content completion is essentially even across all three grades (23 of 28 projects each) — no grade is lagging. The outstanding 18% is concentrated entirely in a handful of Math &amp; Science chapters still "In Creation" or "Not started," spread across all three grades rather than any single one.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">Timeline <span class="hint">— AY2026-27, relative to snapshot date 2026-08-13</span></h2>
+    <div class="card">
+      <div class="tl">
+        <div class="ev done">
+          <div class="d">6 Aug 2026 → Completed</div>
+          <div class="t">Grade 7 Maths Project 1 — translation review completed on time</div>
+        </div>
+        <div class="ev done">
+          <div class="d">11 Aug 2026 → Completed</div>
+          <div class="t">Grade 7 Science Project 2 — translation review completed on time</div>
+        </div>
+        <div class="ev due">
+          <div class="d">13 Aug 2026 — due today</div>
+          <div class="t">Grade 8 Maths Project 2 ("The Quilt Pattern Lab") — still "In Review"</div>
+        </div>
+        <div class="ev">
+          <div class="d">Sep 2026, 1st &amp; 2nd week</div>
+          <div class="t">Master Trainer state-level residential training — 2 batches, 3 days each (230 MTs total)</div>
+          <div class="x">Followed immediately by zone-level HM &amp; teacher cascade training (~1,184 HMs, ~7,000 teachers) in the 2nd–3rd week of September.</div>
+        </div>
+        <div class="ev gap">
+          <div class="d">Since mid-June 2026 — gap</div>
+          <div class="t">Weekly Meeting–MoM log has not been updated</div>
+          <div class="x">Only 2 weeks of minutes exist (8-12 &amp; 15-19 June); a ~2-month blind spot heading into rollout.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="district-level-school-coverage">
+    <h2 class="sec-title">District-level school coverage <span class="hint">— Grades 6-8, all 30 districts, state-wide</span></h2>
+    <div class="live-status" id="live-status">Loading live data…</div>
+    <div class="card">
+      <div class="tiles" style="margin-bottom:18px;">
+        <div class="tile"><div class="val" id="dc-total-schools">–</div><div class="lbl">Schools with Gr. 6, 7 or 8</div></div>
+        <div class="tile"><div class="val" id="dc-districts">–</div><div class="lbl">Districts covered</div></div>
+        <div class="tile"><div class="val" id="dc-students">–</div><div class="lbl">Students, all grades (these schools)</div></div>
+        <div class="tile"><div class="val" id="dc-teachers">–</div><div class="lbl">Teachers (these schools)</div></div>
+      </div>
+      <div class="grid2">
+        <div>
+          <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:10px;">Schools by district (all 30, sorted)</div>
+          <div class="barchart" id="dc-barlist" style="max-height:420px;overflow-y:auto;padding-right:4px;">
+            <div class="note">Loading district data…</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:10px;">Relative distribution — district intensity grid</div>
+          <div class="heatgrid" id="dc-heatgrid"></div>
+          <div class="note">Darker tile = more qualifying schools. This is a relative-intensity grid, not a geographic map — districts aren't drawn to their actual shape or position.</div>
+        </div>
+      </div>
+      <div class="note callout" id="dc-source-note">Loading source details…</div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">School explorer <span class="hint">— search and filter individual schools</span></h2>
+    <div class="card">
+      <div class="filters-row">
+        <input type="search" id="dc-search" placeholder="Search school name or UDISE code…" aria-label="Search schools">
+        <select id="dc-district-filter" aria-label="Filter by district"><option value="">All districts</option></select>
+        <select id="dc-block-filter" aria-label="Filter by block"><option value="">All blocks</option></select>
+        <select id="dc-grade-filter" aria-label="Filter by grade">
+          <option value="">Grade 6, 7 or 8</option>
+          <option value="6">Grade 6</option>
+          <option value="7">Grade 7</option>
+          <option value="8">Grade 8</option>
+        </select>
+        <span class="filters-count" id="dc-result-count"></span>
+      </div>
+      <div class="table-wrap">
+        <table class="dc-table" id="dc-table">
+          <thead><tr><th>School</th><th>District</th><th>Block</th><th>Classes</th><th>Students</th><th>Location</th></tr></thead>
+          <tbody id="dc-table-body"><tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;">Loading schools…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="pager" id="dc-pager"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">Budget <span class="hint">— AY2026-27 planning figures</span></h2>
+    <div class="grid3">
+      <div class="budget-card">
+        <div class="t">PBL Kits</div>
+        <div class="v" id="budget-pblkit">₹13.51 Cr</div>
+        <div class="d">₹7,660/school × 17,633 schools (schools offering Gr. 6, 7, and/or 8, from the "S&amp;ME School" tab). Cardboard boxes, chart paper &amp; stationery for hands-on PBL activities — to be arranged by each school from available budget heads.</div>
+      </div>
+      <div class="budget-card">
+        <div class="t">MT Residential Training</div>
+        <div class="v">₹9,92,700</div>
+        <div class="d">400 participants · 2-day residential state-level training. Food/travel/logistics largely borne by the Department; training kits &amp; resource persons by Mantra4Change.</div>
+      </div>
+      <div class="budget-card">
+        <div class="t">Teacher Training (Cascading)</div>
+        <div class="v critical">₹0</div>
+        <div class="d">District/block-level cascade training for teachers — line item exists but has no allocated budget yet.</div>
+        <div class="flagrow">✕ Not yet budgeted</div>
+      </div>
+    </div>
+    <div class="note callout" style="margin-top:14px;">
+      <b>Basis note:</b> The ₹7,660/school kit rate comes from the source sheet's "PBL Kit" tab (Active), which itself states a total of ~₹18.38 Cr against that tab's own 24,000-school "1. Scope" figure. This dashboard now applies that same per-school rate to <b>17,633 schools</b> — schools offering Grade 6, 7, and/or 8, from the "S&amp;ME School" tab — giving <b>₹13.51 Cr</b>; that total is recomputed here, not stated directly in the sheet. A third figure worth knowing: the same workbook's "Cascading (Teachers &amp; MTs)" tab (also Active) sizes actual AY2026-27 Master Trainer and HM/teacher cascade-training deployment to <b>1,184 schools</b> instead. None of the three figures are errors — they simply describe different scopes.
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">Task ownership <span class="hint">— tasks owned, "Owner" columns across Active tabs (Program Index, WIP-Odisha Exec. Muscle)</span></h2>
+    <div class="card barchart">
+      <div class="row"><div class="name">Subhankar</div><div class="track"><div class="fill" style="width:100%;background:var(--seq-600)" title="23 tasks owned"></div></div><div class="value">23</div></div>
+      <div class="row"><div class="name">Aarfin</div><div class="track"><div class="fill" style="width:43.5%;background:var(--seq-450)" title="10 tasks owned"></div></div><div class="value">10</div></div>
+      <div class="row"><div class="name">Anagha</div><div class="track"><div class="fill" style="width:21.7%;background:var(--seq-400)" title="5 tasks owned"></div></div><div class="value">5</div></div>
+      <div class="row"><div class="name">Harsen</div><div class="track"><div class="fill" style="width:17.4%;background:var(--seq-300)" title="4 tasks owned"></div></div><div class="value">4</div></div>
+      <div class="note">Sushree and Soumya sign off as <i>reviewers</i> on the lesson-plan trackers, not as task owners in any Active tab's Owner column. <b>Bus-factor risk:</b> Subhankar owns more than half of all explicitly-assigned tasks across Active tabs — strategy, LFA, MSTF/PBL Unit formation, orientation session plans, and cascading execution.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">Risks &amp; gaps <span class="hint">— AY2026-27</span></h2>
+    <div class="risks">
+      <div class="risk"><div class="ic critical">✕</div><div class="body"><div class="t">District/block orientation stalled</div><div class="d">No Session Plan, PPT, or Logistics owner logged for District or Block Official orientation, while state-level (MSTF, PBL Unit) orientation is fully complete.</div><div class="lvl">Critical</div></div></div>
+      <div class="risk"><div class="ic critical">✕</div><div class="body"><div class="t">Teacher Training (Cascading) unbudgeted</div><div class="d">The district/block-level teacher cascade-training line item still shows ₹0 — no funds allocated for AY2026-27 as of this snapshot.</div><div class="lvl">Critical</div></div></div>
+      <div class="risk"><div class="ic warning">▲</div><div class="body"><div class="t">Govt. Engagement Tracker empty</div><div class="d">Headers exist (Department, Officer, Relationship Status, Last Interaction) but zero rows of real data, despite government relationship-building being a stated priority.</div><div class="lvl">Warning</div></div></div>
+      <div class="risk"><div class="ic warning">▲</div><div class="body"><div class="t">No partner org for Sambalpur zone</div><div class="d">Explicit sheet comment: no partner currently mapped for Sambalpur; Sundargarh and Mayurbhanj also flagged as large districts needing more partner capacity.</div><div class="lvl">Warning</div></div></div>
+      <div class="risk"><div class="ic warning">▲</div><div class="body"><div class="t">Weekly MoM cadence stopped</div><div class="d">Only 2 weeks of meeting minutes logged (early-mid June); no visible record since, right as implementation begins.</div><div class="lvl">Warning</div></div></div>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    Generated from "STEP Odisha_Program Management Sheet: 2026-27" (Google Sheets), scoped to Academic Year 2026-27 only. Every figure on this page is sourced from a tab marked "Active" on the sheet's own Index tab — Hidden tabs (e.g. "District wise no. of schools," "Program Summary-EdI," "Impact Assessment," "Inst. Mat.") were deliberately excluded, with one noted exception: the "S&amp;ME School" tab, used for the top-of-page Schools/Head Masters/Teachers KPI tiles, the PBL Kit budget line, and the "District-level school coverage" and "School explorer" sections. It was added to the workbook after the Index tab's own Active/Hidden list was last updated, so it carries no status tag there. Those KPI tiles and the PBL Kit line use that tab's <b>17,633</b>-school count (schools offering Grade 6, 7, and/or 8) in place of the sheet's own <b>24,000</b>-school "1. Scope"/"PBL Kit" figure; see the Budget section's basis note for how the resulting ₹13.51 Cr relates to the sheet's own stated ₹18.38 Cr, and to the "Cascading (Teachers &amp; MTs)" tab's separate <b>1,184</b>-school AY2026-27 cascade-training rollout figure — none of the three school-count figures are errors, they describe different scopes. Figures are roll-ups verified directly against the workbook and should still be cross-checked against the live sheet before external use. This repo is public — it contains internal staff and budget data.
+  </footer>
+
+  <script>
+  (function () {
+    "use strict";
+    var state = { data: null, filtered: [], page: 1, pageSize: 25 };
+    var SEQ = ["--seq-200", "--seq-300", "--seq-400", "--seq-450", "--seq-500", "--seq-600"];
+
+    function fmtNum(n) { return Number(n || 0).toLocaleString("en-IN"); }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    function seqColor(norm) {
+      var i = Math.max(0, Math.min(SEQ.length - 1, Math.round(norm * (SEQ.length - 1))));
+      return "var(" + SEQ[i] + ")";
+    }
+
+    var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Animates a KPI tile's number from its current displayed value to a new
+    // one (or from 0 the first time), preserving any non-numeric prefix/suffix
+    // (₹, ~, "Cr", …). Falls back to a plain swap for non-numeric text, for
+    // reduced motion, or when the page is in a background/inactive tab —
+    // requestAnimationFrame never fires there, so without this bypass a value
+    // with no static fallback (e.g. the district-coverage tiles, which start
+    // as "–") would stay stuck at its placeholder forever if the dashboard is
+    // opened in a background tab and never brought to the front.
+    function setNumberText(el, text) {
+      if (!el) return;
+      var m = String(text).match(/^([^\d]*)([\d][\d,]*(?:\.\d+)?)(.*)$/);
+      if (!m || reduceMotion || document.hidden) { el.textContent = text; return; }
+      var prefix = m[1], suffix = m[3];
+      var target = parseFloat(m[2].replace(/,/g, ""));
+      var decimals = (m[2].split(".")[1] || "").length;
+      var prevMatch = String(el.textContent).match(/^[^\d]*([\d][\d,]*(?:\.\d+)?)/);
+      var start = prevMatch ? parseFloat(prevMatch[1].replace(/,/g, "")) : 0;
+      if (!isFinite(start)) start = 0;
+      if (start === target) { el.textContent = text; return; }
+      var duration = 700, t0 = null, done = false;
+      function finish() { if (!done) { done = true; el.textContent = text; } }
+      function tick(ts) {
+        if (done) return;
+        if (t0 === null) t0 = ts;
+        var p = Math.min(1, (ts - t0) / duration);
+        var eased = 1 - Math.pow(1 - p, 3);
+        var val = start + (target - start) * eased;
+        el.textContent = prefix + val.toLocaleString("en-IN", { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) + suffix;
+        if (p < 1) requestAnimationFrame(tick); else done = true;
+      }
+      requestAnimationFrame(tick);
+      // Backstop: guarantees the final value lands within ~1s even if rAF
+      // stalls mid-animation (e.g. the tab is backgrounded partway through).
+      setTimeout(finish, duration + 150);
+    }
+
+    // Donut hover/focus tooltip — reads each donut's data-segments (kept in
+    // sync with its conic-gradient stops) and shows the wedge under the
+    // pointer; keyboard focus shows the first (largest) segment.
+    function initDonutTooltips() {
+      var tip = document.createElement("div");
+      tip.className = "donut-tip";
+      document.body.appendChild(tip);
+
+      function segmentAt(segments, pct) {
+        for (var i = 0; i < segments.length; i++) {
+          if (pct >= segments[i].from && pct < segments[i].to) return segments[i];
+        }
+        return segments[segments.length - 1];
+      }
+
+      function showTip(donut, seg, x, y) {
+        tip.innerHTML = '<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:' +
+          seg.color + ';margin-right:6px;vertical-align:middle;"></span>' +
+          escapeHtml(seg.label) + " — <b>" + escapeHtml(seg.value) + "</b>";
+        tip.style.left = Math.round(x + 14) + "px";
+        tip.style.top = Math.round(y + 14) + "px";
+        tip.classList.add("show");
+      }
+      function hideTip() { tip.classList.remove("show"); }
+
+      document.querySelectorAll(".donut[data-segments]").forEach(function (donut) {
+        var segments;
+        try { segments = JSON.parse(donut.getAttribute("data-segments")); } catch (e) { return; }
+
+        donut.addEventListener("mousemove", function (evt) {
+          var rect = donut.getBoundingClientRect();
+          var cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+          var angle = Math.atan2(evt.clientY - cy, evt.clientX - cx) * 180 / Math.PI;
+          var pct = ((angle + 90 + 360) % 360) / 360 * 100; // 0% at 12 o'clock, matches conic-gradient's default start
+          showTip(donut, segmentAt(segments, pct), evt.clientX, evt.clientY);
+        });
+        donut.addEventListener("mouseleave", hideTip);
+        donut.addEventListener("focus", function () {
+          var rect = donut.getBoundingClientRect();
+          showTip(donut, segments[0], rect.left + rect.width, rect.top);
+        });
+        donut.addEventListener("blur", hideTip);
+      });
+    }
+
+    function districtCounts(data) {
+      var counts = data.districts.map(function () { return { schools: 0, students: 0, teachers: 0 }; });
+      data.rows.forEach(function (r) {
+        var c = counts[r[0]];
+        c.schools++; c.students += r[6]; c.teachers += r[7];
+      });
+      return data.districts
+        .map(function (name, i) { return { name: name, schools: counts[i].schools, students: counts[i].students, teachers: counts[i].teachers }; })
+        .sort(function (a, b) { return b.schools - a.schools; });
+    }
+
+    function renderKPIs(data) {
+      var students = 0, teachers = 0;
+      data.rows.forEach(function (r) { students += r[6]; teachers += r[7]; });
+      setNumberText(document.getElementById("dc-total-schools"), fmtNum(data.meta.qualifying));
+      setNumberText(document.getElementById("dc-districts"), String(data.districts.length));
+      setNumberText(document.getElementById("dc-students"), fmtNum(students));
+      setNumberText(document.getElementById("dc-teachers"), fmtNum(teachers));
+    }
+
+    // Top-of-page Schools/HMs/Teachers KPI tiles and the PBL Kit budget line are
+    // pinned to the same "S&ME School" Grade 6-8 count as the sections above, so
+    // they stay in sync if data/schools.json is regenerated. Falls back to the
+    // static HTML values already in the markup if this fetch/script fails.
+    function renderTopKPIs(data) {
+      var schoolCount = data.meta.qualifying;
+      setNumberText(document.getElementById("top-schools"), fmtNum(schoolCount));
+      setNumberText(document.getElementById("top-hms"), fmtNum(schoolCount));
+      setNumberText(document.getElementById("top-teachers"), fmtNum(schoolCount * 2));
+      var pblCr = "₹" + (schoolCount * 7660 / 1e7).toFixed(2) + " Cr";
+      setNumberText(document.getElementById("top-pblkit"), pblCr);
+      setNumberText(document.getElementById("budget-pblkit"), pblCr);
+    }
+
+    function renderDistrictChart(data) {
+      var list = districtCounts(data);
+      var max = list[0] ? list[0].schools : 1;
+      var wrap = document.getElementById("dc-barlist");
+      wrap.innerHTML = list.map(function (d) {
+        var pct = (d.schools / max * 100).toFixed(1);
+        var color = seqColor(d.schools / max);
+        return '<div class="row"><div class="name">' + escapeHtml(d.name) + '</div>' +
+          '<div class="track"><div class="fill" style="width:' + pct + '%;background:' + color + '" title="' +
+          escapeHtml(d.name) + ' — ' + fmtNum(d.schools) + ' schools"></div></div>' +
+          '<div class="value">' + fmtNum(d.schools) + "</div></div>";
+      }).join("");
+    }
+
+    function renderHeatGrid(data) {
+      var list = districtCounts(data);
+      var max = list[0] ? list[0].schools : 1;
+      var grid = document.getElementById("dc-heatgrid");
+      grid.innerHTML = list.map(function (d) {
+        var norm = d.schools / max;
+        var color = seqColor(norm);
+        var textColor = norm > 0.45 ? "#fff" : "var(--text-primary)";
+        return '<div class="cell" style="background:' + color + ";color:" + textColor + '" title="' +
+          escapeHtml(d.name) + " — " + fmtNum(d.schools) + " schools, " + fmtNum(d.students) + ' students">' +
+          '<div class="n">' + fmtNum(d.schools) + '</div><div class="t">' + escapeHtml(d.name) + "</div></div>";
+      }).join("");
+    }
+
+    function renderSourceNote(data) {
+      var el = document.getElementById("dc-source-note");
+      el.innerHTML = "<b>Source:</b> " + escapeHtml(data.meta.source) + ", snapshot " + escapeHtml(data.meta.snapshotDate) +
+        ". <b>Filter:</b> " + escapeHtml(data.meta.filterRule) + " — " + fmtNum(data.meta.qualifying) + " of " +
+        fmtNum(data.meta.totalRowsInTab) + " schools in the tab qualify (" + fmtNum(data.meta.excluded) +
+        " excluded, offering only Grade 5 or below). This is the full state-wide S&amp;ME-affiliated school list — a much larger, different-scope figure than the 1,184-school AY2026-27 cascade-training rollout used for Master Trainer deployment elsewhere on this page.";
+    }
+
+    function populateFilterOptions(data) {
+      var distSel = document.getElementById("dc-district-filter");
+      data.districts
+        .map(function (name, idx) { return { name: name, idx: idx }; })
+        .sort(function (a, b) { return a.name.localeCompare(b.name); })
+        .forEach(function (d) {
+          var opt = document.createElement("option");
+          opt.value = d.idx; opt.textContent = d.name;
+          distSel.appendChild(opt);
+        });
+    }
+
+    function updateBlockOptions() {
+      var data = state.data;
+      var blockSel = document.getElementById("dc-block-filter");
+      var distVal = document.getElementById("dc-district-filter").value;
+      blockSel.innerHTML = '<option value="">All blocks</option>';
+      var blockIdxs = new Set();
+      data.rows.forEach(function (r) {
+        if (distVal === "" || String(r[0]) === distVal) blockIdxs.add(r[1]);
+      });
+      Array.from(blockIdxs)
+        .map(function (i) { return { i: i, name: data.blocks[i] }; })
+        .sort(function (a, b) { return a.name.localeCompare(b.name); })
+        .forEach(function (b) {
+          var opt = document.createElement("option");
+          opt.value = b.i; opt.textContent = b.name;
+          blockSel.appendChild(opt);
+        });
+    }
+
+    function applyFilters() {
+      var data = state.data;
+      var q = document.getElementById("dc-search").value.trim().toLowerCase();
+      var distVal = document.getElementById("dc-district-filter").value;
+      var blockVal = document.getElementById("dc-block-filter").value;
+      var gradeVal = document.getElementById("dc-grade-filter").value;
+
+      state.filtered = data.rows.filter(function (r) {
+        if (distVal !== "" && String(r[0]) !== distVal) return false;
+        if (blockVal !== "" && String(r[1]) !== blockVal) return false;
+        if (gradeVal !== "") {
+          var g = parseInt(gradeVal, 10);
+          if (!(r[4] <= g && r[5] >= g)) return false;
+        }
+        if (q) {
+          var hay = (r[2] + " " + r[3]).toLowerCase();
+          if (hay.indexOf(q) === -1) return false;
+        }
+        return true;
+      });
+      state.page = 1;
+      renderTable();
+    }
+
+    function renderTable() {
+      var data = state.data;
+      var rows = state.filtered;
+      var totalPages = Math.max(1, Math.ceil(rows.length / state.pageSize));
+      state.page = Math.min(state.page, totalPages);
+      var start = (state.page - 1) * state.pageSize;
+      var pageRows = rows.slice(start, start + state.pageSize);
+
+      document.getElementById("dc-result-count").textContent = fmtNum(rows.length) + (rows.length === 1 ? " school" : " schools");
+
+      var body = document.getElementById("dc-table-body");
+      body.innerHTML = pageRows.map(function (r) {
+        var loc = r[9] === 1 ? "Urban" : r[9] === 0 ? "Rural" : "—";
+        return "<tr><td title=\"" + escapeHtml(r[2]) + "\">" + escapeHtml(r[2]) + "</td><td>" +
+          escapeHtml(data.districts[r[0]]) + "</td><td>" + escapeHtml(data.blocks[r[1]]) + "</td><td>" +
+          r[4] + "–" + r[5] + "</td><td>" + fmtNum(r[6]) + "</td><td>" + loc + "</td></tr>";
+      }).join("") || '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;">No schools match these filters.</td></tr>';
+
+      var pager = document.getElementById("dc-pager");
+      pager.innerHTML =
+        '<button id="dc-prev"' + (state.page <= 1 ? " disabled" : "") + ">‹ Prev</button>" +
+        "<span>Page " + state.page + " of " + totalPages + "</span>" +
+        '<button id="dc-next"' + (state.page >= totalPages ? " disabled" : "") + ">Next ›</button>";
+      var prevBtn = document.getElementById("dc-prev");
+      var nextBtn = document.getElementById("dc-next");
+      if (prevBtn) prevBtn.addEventListener("click", function () { state.page--; renderTable(); });
+      if (nextBtn) nextBtn.addEventListener("click", function () { state.page++; renderTable(); });
+    }
+
+    // Auto-refresh: the GitHub Action behind data/schools.json commits a fresh
+    // copy roughly every 15 min whenever the sheet changes. An open tab polls
+    // for that on its own timer so it updates without a manual reload.
+    var POLL_MS = 3 * 60 * 1000;
+    var pollTimer = null;
+
+    function setLiveStatus(kind, text) {
+      var el = document.getElementById("live-status");
+      if (!el) return;
+      el.className = "live-status " + kind;
+      el.innerHTML = '<span class="dot"></span>' + escapeHtml(text);
+    }
+
+    function timeNow() {
+      return new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    }
+
+    function firstInit(data) {
+      state.data = data;
+      renderKPIs(data);
+      renderTopKPIs(data);
+      renderDistrictChart(data);
+      renderHeatGrid(data);
+      renderSourceNote(data);
+      populateFilterOptions(data);
+      applyFilters();
+      document.getElementById("dc-search").addEventListener("input", applyFilters);
+      document.getElementById("dc-district-filter").addEventListener("change", function () { updateBlockOptions(); applyFilters(); });
+      document.getElementById("dc-block-filter").addEventListener("change", applyFilters);
+      document.getElementById("dc-grade-filter").addEventListener("change", applyFilters);
+      setLiveStatus("live", "Live — checked " + timeNow() + " (auto-refreshes every 3 min)");
+      startPolling();
+    }
+
+    function refreshInit(data) {
+      // Same as firstInit's render steps, but preserves the visitor's current
+      // search/filter/page state and dropdown selections instead of resetting them.
+      var prevDistVal = document.getElementById("dc-district-filter").value;
+      var prevBlockVal = document.getElementById("dc-block-filter").value;
+      var changed = !state.data || JSON.stringify(state.data.meta) !== JSON.stringify(data.meta);
+
+      state.data = data;
+      renderKPIs(data);
+      renderTopKPIs(data);
+      renderDistrictChart(data);
+      renderHeatGrid(data);
+      renderSourceNote(data);
+
+      var distSel = document.getElementById("dc-district-filter");
+      distSel.innerHTML = '<option value="">All districts</option>';
+      populateFilterOptions(data);
+      distSel.value = prevDistVal;
+      updateBlockOptions();
+      document.getElementById("dc-block-filter").value = prevBlockVal;
+
+      applyFilters();
+      setLiveStatus("live", (changed ? "Updated — refreshed " : "Live — checked ") + timeNow() + " (auto-refreshes every 3 min)");
+    }
+
+    function loadData(isFirst) {
+      return fetch("data/schools.json", { cache: "no-cache" })
+        .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+        .then(isFirst ? firstInit : refreshInit)
+        .catch(function (err) {
+          var msg = "Could not load school data (data/schools.json): " + err.message;
+          if (isFirst) {
+            var note = document.getElementById("dc-source-note");
+            if (note) note.textContent = msg;
+            var body = document.getElementById("dc-table-body");
+            if (body) body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--status-critical);padding:20px;">' + msg + "</td></tr>";
+          }
+          setLiveStatus("error", "Auto-refresh failed at " + timeNow() + " — showing last-loaded data");
+        });
+    }
+
+    function startPolling() {
+      if (pollTimer) return;
+      pollTimer = setInterval(function () {
+        if (document.visibilityState === "visible") loadData(false);
+      }, POLL_MS);
+    }
+
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "visible" && state.data) loadData(false);
+    });
+
+    initDonutTooltips();
+    loadData(true);
+  })();
+  </script>
+
+</div>
+</div>
+</body>
+</html>

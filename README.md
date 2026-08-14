@@ -6,7 +6,7 @@ A static analytics dashboard summarizing the **STEP Odisha_Program Management Sh
 
 ## Viewing it
 
-Live at: https://harsen-alt.github.io/step-odisha-dashboard/
+Live at: https://harsen-alt.github.io/step-odisha-dashboard/ — a landing page (`index.html`) with hero stats and program branding; click through to the full dashboard (`dashboard.html`) for all the detail below.
 
 Scoped to **Academic Year 2026-27 only** — prior-year comparisons have been dropped per program-team direction. The top-line Schools/Head Masters/Teachers KPI tiles and the PBL Kit budget line use the **17,633-school** "S&ME School" tab count (schools offering Grade 6, 7, and/or 8), in place of the sheet's own 24,000-school "1. Scope" tab figure — see the note below.
 
