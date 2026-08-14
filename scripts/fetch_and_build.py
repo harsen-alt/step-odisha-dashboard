@@ -5,10 +5,14 @@ directly (using a read-only service account) and regenerates data/schools.json.
 No manual export step, no local file needed.
 
 Fetches by the tab's numeric sheetId (gid) via the CSV export endpoint rather
-than by name through the Sheets API's values.get A1-range parser — that parser
-rejects ranges whose (quoted) sheet name contains "&", which "S&ME School"
-does, always failing with "Unable to parse range" regardless of credentials
-or sharing. Looking the gid up by title first sidesteps that entirely.
+than by name through the Sheets API's values.get A1-range parser. That parser
+was failing with "Unable to parse range" regardless of credentials or sharing
+— not because of the "&" in the name, but because the live tab is actually
+named "S&ME School " (trailing space), and the API reports that kind of name
+mismatch with the same generic parse error as a real syntax problem. Looking
+the gid up by (whitespace-tolerant) title first surfaces a clear "tab not
+found, here's what's actually there" error instead, and sidesteps the A1
+parser entirely.
 
 Requires:
   - env GOOGLE_SERVICE_ACCOUNT_JSON: the full service-account key JSON (as a
@@ -54,8 +58,12 @@ def fetch_records():
     meta = service.spreadsheets().get(
         spreadsheetId=spreadsheet_id, fields="sheets.properties"
     ).execute()
+    # Matched by stripped title: the live tab is actually named "S&ME School "
+    # (trailing space) — exact-match would silently break again on any similar
+    # whitespace drift, and the Sheets API's own range parser reports that kind
+    # of name mismatch as an opaque "Unable to parse range" rather than "not found".
     sheets = [s["properties"] for s in meta.get("sheets", [])]
-    match = next((s for s in sheets if s.get("title") == SHEET_NAME), None)
+    match = next((s for s in sheets if s.get("title", "").strip() == SHEET_NAME.strip()), None)
     if match is None:
         available = ", ".join(repr(s.get("title")) for s in sheets)
         sys.exit(f"No tab named {SHEET_NAME!r} in this spreadsheet. Available tabs: {available}")
