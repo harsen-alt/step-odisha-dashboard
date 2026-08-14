@@ -573,12 +573,16 @@
 
     // Animates a KPI tile's number from its current displayed value to a new
     // one (or from 0 the first time), preserving any non-numeric prefix/suffix
-    // (₹, ~, "Cr", …). Falls back to a plain swap for non-numeric text or
-    // when the visitor has asked for reduced motion.
+    // (₹, ~, "Cr", …). Falls back to a plain swap for non-numeric text, for
+    // reduced motion, or when the page is in a background/inactive tab —
+    // requestAnimationFrame never fires there, so without this bypass a value
+    // with no static fallback (e.g. the district-coverage tiles, which start
+    // as "–") would stay stuck at its placeholder forever if the dashboard is
+    // opened in a background tab and never brought to the front.
     function setNumberText(el, text) {
       if (!el) return;
       var m = String(text).match(/^([^\d]*)([\d][\d,]*(?:\.\d+)?)(.*)$/);
-      if (!m || reduceMotion) { el.textContent = text; return; }
+      if (!m || reduceMotion || document.hidden) { el.textContent = text; return; }
       var prefix = m[1], suffix = m[3];
       var target = parseFloat(m[2].replace(/,/g, ""));
       var decimals = (m[2].split(".")[1] || "").length;
@@ -586,16 +590,21 @@
       var start = prevMatch ? parseFloat(prevMatch[1].replace(/,/g, "")) : 0;
       if (!isFinite(start)) start = 0;
       if (start === target) { el.textContent = text; return; }
-      var duration = 700, t0 = null;
+      var duration = 700, t0 = null, done = false;
+      function finish() { if (!done) { done = true; el.textContent = text; } }
       function tick(ts) {
+        if (done) return;
         if (t0 === null) t0 = ts;
         var p = Math.min(1, (ts - t0) / duration);
         var eased = 1 - Math.pow(1 - p, 3);
         var val = start + (target - start) * eased;
         el.textContent = prefix + val.toLocaleString("en-IN", { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) + suffix;
-        if (p < 1) requestAnimationFrame(tick);
+        if (p < 1) requestAnimationFrame(tick); else done = true;
       }
       requestAnimationFrame(tick);
+      // Backstop: guarantees the final value lands within ~1s even if rAF
+      // stalls mid-animation (e.g. the tab is backgrounded partway through).
+      setTimeout(finish, duration + 150);
     }
 
     // Donut hover/focus tooltip — reads each donut's data-segments (kept in
